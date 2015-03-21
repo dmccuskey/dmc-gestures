@@ -25,7 +25,7 @@ module_config = {
 			"DMC-Lua-Library",
 			"dmc-objects",
 			"dmc-utils",
-			#"dmc-touchmanager"
+			"dmc-touchmanager"
 		]
 	},
 	"examples": {
