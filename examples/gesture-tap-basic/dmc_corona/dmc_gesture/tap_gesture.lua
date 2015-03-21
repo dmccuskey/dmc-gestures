@@ -92,48 +92,41 @@ TapGesture.MAX_DISTANCE_OFFSET = 10
 function TapGesture:__init__( params )
 	-- print( "TapGesture:__init__", params )
 	params = params or {}
-	if params.taps==nil then params.taps=1 end
-	if params.touches==nil then params.touches=1 end
-	if params.time==nil then params.time=TapGesture.MAX_TIME_INTERVAL end
 	if params.offset==nil then params.offset=TapGesture.MAX_DISTANCE_OFFSET end
+	if params.taps==nil then params.taps=1 end
+	if params.time==nil then params.time=TapGesture.MAX_TIME_INTERVAL end
+	if params.touches==nil then params.touches=1 end
 
 	self:superCall( '__init__', params )
 	--==--
 
-	--== Sanity Check ==--
-
-	assert( type(params.time)=='number' and params.time>10 )
-	assert( type(params.offset)=='number' and params.time>=0 )
-
-	assert( type(params.taps)=='number' )
-	assert( params.taps>0 and params.taps<5 )
-
-	assert( type(params.touches)=='number' )
-	assert( params.touches>0 and params.touches<5 )
-
 	--== Create Properties ==--
 
-	self._max_time = params.time
 	self._max_offset = params.offset
-
 	self._req_taps = params.taps
+	self._max_time = params.time
 	self._req_touches = params.touches
 
-	self._taps = 0 -- how many we've seen
+	self._tap_count = 0 -- how many we've seen
 	self._tap_timer = nil
-	self._touches = 0 -- active touches
-	self._touch_timer = nil
+
+	self._fail_timer = nil
 
 end
 
 
---[[
 function TapGesture:__initComplete__()
 	-- print( "TapGesture:__initComplete__" )
 	self:superCall( '__initComplete__' )
 	--==--
+	--== use setters
+	self.offset = self._max_offset
+	self.taps = self._req_taps
+	self.time = self._max_time
+	self.touches = self._req_touches
 end
 
+--[[
 function TapGesture:__undoInitComplete__()
 	-- print( "TapGesture:__undoInitComplete__" )
 	--==--
@@ -150,7 +143,44 @@ end
 --== Public Methods
 
 
--- none
+function TapGesture.__getters:offset()
+	return self._max_offset
+end
+function TapGesture.__setters:offset( value )
+	assert( type(value)=='number' and value>0 )
+	--==--
+	self._max_offset = value
+end
+
+
+function TapGesture.__getters:taps()
+	return self._req_taps
+end
+function TapGesture.__setters:taps( value )
+	assert( type(value)=='number' and ( value>0 and value<6 ) )
+	--==--
+	self._req_taps = value
+end
+
+
+function TapGesture.__getters:time()
+	return self._max_time
+end
+function TapGesture.__setters:time( value )
+	assert( type(value)=='number' and value>10 )
+	--==--
+	self._max_time = value
+end
+
+
+function TapGesture.__getters:touches()
+	return self._req_touches
+end
+function TapGesture.__setters:touches( value )
+	assert( type(value)=='number' and ( value>0 and value<5 ) )
+	--==--
+	self._req_touches = value
+end
 
 
 
@@ -160,10 +190,32 @@ end
 
 function TapGesture:_do_reset()
 	-- print( "TapGesture:_do_reset" )
+	Gesture._do_reset( self )
 	self._tap_count=0
-	self._touch_count=0
 	self:_stopAllTimers()
 end
+
+
+function TapGesture:_stopFailTimer()
+	-- print( "TapGesture:_stopFailTimer" )
+	if not self._fail_timer then return end
+	timer.cancel( self._fail_timer )
+	self._fail_timer=nil
+end
+
+function TapGesture:_startFailTimer()
+	-- print( "TapGesture:_startFailTimer", self )
+	self:_stopFailTimer()
+	local time = self._max_time
+	local func = function()
+		timer.performWithDelay( 1, function()
+			self:gotoState( TapGesture.STATE_FAILED )
+			self._fail_timer = nil
+		end)
+	end
+	self._fail_timer = timer.performWithDelay( time, func )
+end
+
 
 
 function TapGesture:_stopTapTimer()
@@ -174,34 +226,23 @@ function TapGesture:_stopTapTimer()
 end
 
 function TapGesture:_startTapTimer()
-	-- print( "TapGesture:_startTapTimer" )
+	-- print( "TapGesture:_startTapTimer", self )
+	self:_stopFailTimer()
 	self:_stopTapTimer()
-	local TIME = self._max_time
+	local time = self._max_time
 	local func = function()
 		timer.performWithDelay( 1, function()
 			self:gotoState( TapGesture.STATE_FAILED )
 			self._tap_timer = nil
 		end)
 	end
-	self._tap_timer = timer.performWithDelay( TIME, func )
-end
-
-
-function TapGesture:_stopTouchTimer()
-	-- print( "TapGesture:_stopTouchTimer" )
-	self._touch_timer=0
-end
-
-function TapGesture:_startTouchTimer()
-	-- print( "TapGesture:_startTouchTimer" )
-	self:_stopTouchTimer()
-	self._touch_timer=0
+	self._tap_timer = timer.performWithDelay( time, func )
 end
 
 
 function TapGesture:_stopAllTimers()
+	self:_stopFailTimer()
 	self:_stopTapTimer()
-	self:_stopTouchTimer()
 end
 
 
@@ -213,21 +254,24 @@ end
 -- event is Corona Touch Event
 --
 function TapGesture:touch( event )
-	-- print("TapGesture:touch", event.phase )
-	local _mabs = mabs
+	-- print("TapGesture:touch", event.phase, self )
+	Gesture.touch( self, event )
+
 	local phase = event.phase
-	local offset = self._max_offset
-	local r_taps = self._req_taps
-	local r_taps = self._req_taps
-	local taps = self._tap_count
-	local r_touches = self._req_touches
-	local touches = self._touch_count
+	local touch_count = self._touch_count
 
 	if phase=='began' then
-		touches = touches + 1
-		self:_startTapTimer()
+		self:_startFailTimer()
+		local r_touches = self._req_touches
+		if touch_count==r_touches then
+			self:_startTapTimer()
+		elseif touch_count>r_touches then
+			self:gotoState( TapGesture.STATE_FAILED )
+		end
 
 	elseif phase=='moved' then
+		local _mabs = mabs
+		local offset = self._max_offset
 		if _mabs(event.xStart-event.x)>offset or _mabs(event.yStart-event.y)>offset then
 			self:gotoState( TapGesture.STATE_FAILED )
 		end
@@ -236,19 +280,19 @@ function TapGesture:touch( event )
 		self:gotoState( TapGesture.STATE_FAILED )
 
 	else -- ended
-		taps = taps + 1
-		self._tap_count = taps
-
-		if taps==r_taps and touches==r_touches then
+		local r_taps = self._req_taps
+		local taps = self._tap_count
+		if self._tap_timer and touch_count==0 then
+			taps = taps + 1
+		end
+		if taps==r_taps then
 			self:gotoState( TapGesture.STATE_RECOGNIZED )
-		elseif taps>r_taps or touches>r_touches then
+		elseif taps>r_taps then
 			self:gotoState( TapGesture.STATE_FAILED )
 		end
-
-		touches = touches - 1
+		self._tap_count = taps
 	end
 
-	self._touch_count = touches
 end
 
 
@@ -263,7 +307,6 @@ function TapGesture:do_state_recognized( params )
 	-- print( "TapGesture:do_state_recognized" )
 	self:_stopAllTimers()
 	Gesture.do_state_recognized( self, params )
-	self:_dispatchRecognizedEvent()
 end
 
 

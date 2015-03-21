@@ -1,11 +1,11 @@
 --====================================================================--
 -- Gesture Tap Basic
 --
--- Shows simple use of
+-- Shows simple use of Tap Gesture
 --
 -- Sample code is MIT licensed, the same license which covers Lua itself
 -- http://en.wikipedia.org/wiki/MIT_License
--- Copyright (C) 2012-2015 David McCuskey. All Rights Reserved.
+-- Copyright (C) 2015 David McCuskey. All Rights Reserved.
 --====================================================================--
 
 
@@ -20,7 +20,6 @@ print( '\n\n##############################################\n\n' )
 
 local Gesture = require 'dmc_corona.dmc_gesture'
 
-local TouchMgr = require 'dmc_corona.dmc_touchmanager'
 
 
 --====================================================================--
@@ -33,6 +32,7 @@ local H_CENTER, V_CENTER = W*0.5, H*0.5
 
 local txt_display, txt_display_t
 local timer_t
+local circle
 
 
 
@@ -73,14 +73,17 @@ end
 local function gestureEvent_handler( event )
 	-- print( "gestureEvent_handler" )
 	if event.type == event.target.GESTURE then
-		displayFeedback( "Gesture: "..tostring(event.gesture) )
+		if event.phase=='began' then
+			circle = display.newCircle( event.x, event.y, 10 )
+		elseif event.phase=='changed' then
+			circle.x, circle.y = event.x, event.y
+		else
+			if circle then circle:removeSelf() ; circle=nil end
+		end
+		displayFeedback( "Gesture: "..tostring(event.id) )
 	end
 end
 
-
-local function viewTouchEvent_handler( event )
-	print("viewTouchEvent_handler", event, event.phase, event.isFocused )
-end
 
 
 --====================================================================--
@@ -92,27 +95,27 @@ local function main()
 
 	local view, tap
 
-	setupUI()
-
 	-- create touch area for gestures
 
 	view = display.newRect( H_CENTER, V_CENTER+40, V_CENTER, V_CENTER )
 	view:setFillColor( 0.3,0.3,0.3 )
-	-- TouchMgr.register( view, viewTouchEvent_handler )
 
 	-- create a gesture, link to touch area
 
-	-- tap = Gesture.newTapGesture( view, {taps=2,touches=1} )
-	tap = Gesture.newTapGesture( view )
+	tap = Gesture.newTapGesture( view, { id="1 tch 1 tap" }  )
 	tap:addEventListener( tap.EVENT, gestureEvent_handler )
 
+	tap = Gesture.newTapGesture( view, { touches=2, taps=2, id="2 tch 2 tap" } )
+	tap:addEventListener( tap.EVENT, gestureEvent_handler )
 
-	-- tap = Gesture.removeGestures( view )
+	tap = Gesture.newTapGesture( view, { touches=3, taps=1, id="3 tch 1 tap" } )
+	tap:addEventListener( tap.EVENT, gestureEvent_handler )
 
 end
 
 
 -- start the action !
 
+setupUI()
 main()
 

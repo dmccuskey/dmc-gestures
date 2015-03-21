@@ -167,11 +167,12 @@ end
 
 
 function GestureMgr:addGesture( gesture )
+	-- print( "GestureMgr:addGesture", gesture )
 	assert( gesture )
 	--==--
 	self._gestures[ gesture ] = gesture
 	gesture.gesture_mgr = self
-	self:_resetGestures()
+	self:_resetGestures( {force=true} )
 end
 function GestureMgr:removeGesture( gesture, params )
 	params = params or {}
@@ -179,7 +180,7 @@ function GestureMgr:removeGesture( gesture, params )
 	assert( gesture )
 	--==--
 	self._gestures[ gesture ] = nil
-	if params.reset then self:_resetGestures() end
+	if params.reset then self:_resetGestures({force=true}) end
 end
 
 
@@ -192,16 +193,18 @@ function GestureMgr:_resetPossibleGestures()
 	-- print( "GestureMgr:_resetPossibleGestures" )
 	local active = {}
 	for _, g in pairs( self._gestures ) do
-		-- print( _, g )
 		tinsert( active, g )
 		g:reset()
 	end
 	self._active = active
 end
 
-function GestureMgr:_resetGestures()
+function GestureMgr:_resetGestures( params )
 	-- print( "GestureMgr:_resetGestures" )
-	if #self._active>0 or self._t_active>0 then return end
+	params = params or {}
+	if params.force==nil then params.force=false end
+	--==--
+	if params.force==false and (#self._active>0 or self._t_active>0) then return end
 	self:_resetPossibleGestures()
 end
 
@@ -214,6 +217,7 @@ function GestureMgr:_processBeganTouchEvent( event )
 	local active = self._active
 	for i=#active, 1, -1 do
 		local g = active[i]
+
 		if g:shouldReceiveTouch() then
 			g:touch( event )
 		else
@@ -226,10 +230,11 @@ end
 -- gives Touch Event to Possible Gestures
 --
 function GestureMgr:_processTouchEvent( event )
-	-- print("GestureMgr:_processTouchEvent", event )
+	-- print("GestureMgr:_processTouchEvent", event.phase )
 	local active = self._active
 	for i=#active, 1, -1 do
-		active[i]:touch( event )
+		local g = active[i]
+		if g then g:touch( event ) end
 	end
 end
 
@@ -258,7 +263,6 @@ function GestureMgr:_failOtherGestures( gesture )
 	local active = self._active
 	for i=#active, 1, -1 do
 		local g = active[i]
-		-- print(i)
 		if g~=gesture then
 			local failed = g:forceToFail( gesture )
 			if failed then
@@ -313,17 +317,20 @@ function GestureMgr:touch( event )
 		self._t_active=self._t_active+1
 		self._touch_mgr.setFocus( target, event.id )
 		self:_processBeganTouchEvent( event )
-
-	else
-		-- moved/ended/cancled
-		self:_processTouchEvent( event )
-
 	end
 
-	if phase=='ended' or phase=='canceled' then
+	if self._t_active==0 then return end
+
+	-- moved/ended/canceled
+	if phase=='moved' then
+		self:_processTouchEvent( event )
+
+	elseif phase=='ended' or phase=='canceled' then
+		self:_processTouchEvent( event )
 		self._t_active=self._t_active-1
 		self._touch_mgr.unsetFocus( target, event.id )
 		self:_resetGestures()
+
 	end
 
 end

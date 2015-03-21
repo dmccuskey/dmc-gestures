@@ -166,6 +166,32 @@ end
 
 
 --======================================================--
+-- newPanGesture Support
+
+function Gesture._loadPanGestureSupport( params )
+	-- print( "Gesture._loadPanGestureSupport" )
+	if Gesture.Pan then return end
+	--==--
+	local PanGesture = require 'dmc_gesture.pan_gesture'
+	Gesture.Pan=PanGesture
+end
+
+---
+--
+--
+function Gesture.newPanGesture( view, params )
+	-- print( "Gesture.newPanGesture", view )
+	params = params or {}
+	params.view = view
+	--==--
+	if not Gesture.Pan then Gesture._loadPanGestureSupport() end
+	local o = Gesture.Pan:new( params )
+	Gesture._addGestureToManager( o )
+	return o
+end
+
+
+--======================================================--
 -- newTapGesture Support
 
 function Gesture._loadTapGestureSupport( params )
@@ -194,7 +220,7 @@ end
 
 
 function Gesture._addGestureToManager( gesture )
-	-- print( "Gesture._addGestureToManager", gesture )
+	-- print( "Gesture._addGestureToManager", gesture, gesture.view )
 	local g_mgr = Gesture._addGestureManager( gesture.view )
 	g_mgr:addGesture( gesture )
 	return g_mgr

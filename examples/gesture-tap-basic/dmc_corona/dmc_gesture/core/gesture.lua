@@ -80,6 +80,10 @@ local Gesture = newClass(
 
 --== Class Constants
 
+Gesture.TYPE = nil -- override this
+
+--== State Constants
+
 Gesture.STATE_CREATE = 'state_create'
 Gesture.STATE_POSSIBLE = 'state_possible'
 Gesture.STATE_FAILED = 'state_failed'
@@ -119,6 +123,9 @@ function Gesture:__init__( params )
 	self._delegate = params.delegate
 
 	self._touch_count = 0
+	self._total_touch_count = 0
+	self._touches = {} -- keyed on ID
+	self._multitouch_evt = nil
 
 	self._gesture_mgr = params.gesture_mgr
 
@@ -197,6 +204,10 @@ end
 
 
 function Gesture:_do_reset()
+	self._total_touch_count = 0
+	self._touch_count = 0
+	self._touches = {} -- keyed on ID
+	self._multitouch_evt = nil
 end
 
 function Gesture:reset()
@@ -216,7 +227,7 @@ end
 
 
 function Gesture:forceToFail( gesture )
-	-- print( "Gesture:reset" )
+	-- print( "Gesture:forceToFail", gesture )
 	local del = self._delegate
 	local f = del and del.shouldRecognizeSimultaneously
 	local shouldResume = false
@@ -233,6 +244,7 @@ end
 --== Private Methods
 
 
+-- this one goes to the Gesture Manager
 function Gesture:_dispatchGestureNotification( notify )
 	-- print("Gesture:_dispatchGestureNotification", notify )
 	local g_mgr = self._gesture_mgr
@@ -246,7 +258,7 @@ function Gesture:_dispatchGestureNotification( notify )
 	end
 end
 
-
+-- this one goes to the Gesture Manager
 function Gesture:_dispatchStateNotification( notify )
 	-- print("Gesture:_dispatchStateNotification" )
 	local g_mgr = self._gesture_mgr
@@ -261,6 +273,7 @@ function Gesture:_dispatchStateNotification( notify )
 end
 
 
+-- this one goes to the Gesture consumer (who created gesture)
 function Gesture:_dispatchRecognizedEvent( data )
 	-- print("Gesture:_dispatchRecognizedEvent" )
 	data = data or {}
@@ -271,13 +284,56 @@ function Gesture:_dispatchRecognizedEvent( data )
 end
 
 
+function Gesture:_createTouchEvent( event )
+	-- print( "Gesture:_createTouchEvent", event, self )
+	self._total_touch_count = self._total_touch_count + 1
+	self._touch_count = self._touch_count + 1
+	self._touches[ tostring(event.id) ] = {
+		id=event.id,
+		name=event.name,
+		target=event.target,
+		isFocused=event.isFocused,
+		phase=event.phase,
+		xStart=event.xStart,
+		yStart=event.yStart,
+		x=event.x,
+		y=event.y,
+	}
+end
+
+function Gesture:_updateTouchEvent( event )
+	-- print( "Gesture:_updateTouchEvent" )
+	for id, evt in pairs( self._touches ) do
+		if id==tostring(event.id) then
+			evt.x, evt.y = event.x, event.y
+			evt.phase = event.phase
+		else
+			evt.phase='stationary'
+		end
+	end
+end
+
+function Gesture:_removeTouchEvent( event )
+	-- print( "Gesture:_removeTouchEvent" )
+	self._touch_count = self._touch_count - 1
+	self._touches[ tostring(event.id) ] = nil
+end
+
 
 --====================================================================--
 --== Event Handlers
 
 
 function Gesture:touch( event )
-	error("OVERRIDE Gesture:touch" )
+	-- print("Gesture:touch" )
+	local phase = event.phase
+	if phase=='began' then
+		self:_createTouchEvent( event )
+	elseif phase=='moved' then
+		self:_updateTouchEvent( event )
+	elseif phase=='canceled' or phase=='ended' then
+	self:_removeTouchEvent( event )
+	end
 end
 
 
@@ -348,6 +404,7 @@ function Gesture:do_state_recognized( params )
 	self:setState( Gesture.STATE_RECOGNIZED )
 	self:_dispatchGestureNotification( params.notify )
 	self:_dispatchStateNotification( params.notify )
+	self:_dispatchRecognizedEvent()
 end
 
 function Gesture:state_recognized( next_state, params )
@@ -371,7 +428,6 @@ function Gesture:do_state_failed( params )
 	--==--
 	self:setState( Gesture.STATE_FAILED )
 	self:_dispatchStateNotification( params.notify )
-
 end
 
 function Gesture:state_failed( next_state, params )
@@ -379,8 +435,10 @@ function Gesture:state_failed( next_state, params )
 
 	if next_state == Gesture.STATE_POSSIBLE then
 		self:do_state_possible( params )
+	elseif next_state == Gesture.STATE_FAILED then
+		-- pass
 	else
-		print( "WARNING :: Gesture:do_state_failed " .. tostring( next_state ) )
+		print( "WARNING :: Gesture:state_failed " .. tostring( next_state ) )
 	end
 end
 
