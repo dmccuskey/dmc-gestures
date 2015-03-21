@@ -14,9 +14,10 @@ module_config = {
 			"dmc_gesture.lua",
 			"dmc_gesture/core/gesture.lua",
 			"dmc_gesture/core/continuous_gesture.lua",
-			"dmc_gesture/core/discrete_gesture.lua",
 			"dmc_gesture/gesture_manager.lua",
-			"dmc_gesture/pinch_gesture.lua",
+			"dmc_gesture/pan_gesture.lua",
+			#"dmc_gesture/pinch_gesture.lua",
+			#"dmc_gesture/swipe_gesture.lua",
 			"dmc_gesture/tap_gesture.lua",
 		],
 		"requires": [
@@ -30,6 +31,10 @@ module_config = {
 	"examples": {
 		"base_dir": "examples",
 		"apps": [
+			{
+				"exp_dir": "gesture-pan-basic",
+				"requires": []
+			},
 			{
 				"exp_dir": "gesture-tap-basic",
 				"requires": []
