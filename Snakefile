@@ -32,6 +32,10 @@ module_config = {
 		"base_dir": "examples",
 		"apps": [
 			{
+				"exp_dir": "gesture-multigesture-basic",
+				"requires": []
+			},
+			{
 				"exp_dir": "gesture-pan-basic",
 				"requires": []
 			},
