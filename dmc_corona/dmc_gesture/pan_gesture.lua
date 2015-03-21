@@ -90,8 +90,8 @@ PanGesture.MAX_DISTANCE_OFFSET = 10
 function PanGesture:__init__( params )
 	-- print( "PanGesture:__init__", params )
 	params = params or {}
-	if params.max_touches==nil then params.max_touches=255 end
 	if params.touches==nil then params.touches=1 end
+	if params.max_touches==nil then params.max_touches=params.touches end
 	if params.offset==nil then params.offset=PanGesture.MAX_DISTANCE_OFFSET end
 
 	self:superCall( '__init__', params )
@@ -150,10 +150,10 @@ function PanGesture.__setters:offset( value )
 	self._offset = value
 end
 
-function PanGesture.__getters:touches()
+function PanGesture.__getters:max_touches()
 	return self._max_touches
 end
-function PanGesture.__setters:touches( value )
+function PanGesture.__setters:max_touches( value )
 	assert( type(value)=='number' and value>0 and value<256 )
 	--==--
 	self._max_touches = value
