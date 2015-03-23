@@ -204,6 +204,7 @@ end
 
 
 function Gesture:_do_reset()
+	-- print( "Gesture:_do_reset" )
 	self._total_touch_count = 0
 	self._touch_count = 0
 	self._touches = {} -- keyed on ID
