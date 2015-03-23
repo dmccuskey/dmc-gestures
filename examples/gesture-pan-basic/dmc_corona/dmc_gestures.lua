@@ -1,8 +1,7 @@
 --===================================================================--
--- dmc_corona/dmc_gesture.lua
+-- dmc_corona/dmc_gestures.lua
 --
--- Documentation:
--- * http://github.com/dmccuskey/lua-error
+-- Documentation: http://docs.davidmccuskey.com/dmc-gestures
 --===================================================================--
 
 --[[
@@ -31,9 +30,16 @@ SOFTWARE.
 
 --]]
 
+--- A Lua module which creates Gesture Recognizers.
+-- @module dmc-gestures
+-- @usage local Gesture = require 'dmc_gestures'
+-- local view = display.newRect( 100, 100, 200, 200 )
+-- local g = Gesture.newPanGesture( view )
+-- g:addEventListener( g.EVENT, gHandler )
+
 
 --====================================================================--
---== DMC Corona Library : Gesture
+--== DMC Corona Library : Gestures
 --====================================================================--
 
 
@@ -125,7 +131,7 @@ local dmc_gesture_data = Utils.extend( dmc_lib_data.dmc_gesture, DMC_GESTURE_DEF
 --== Imports
 
 
-local GestureMgr = require 'dmc_gesture.gesture_manager'
+local GestureMgr = require 'dmc_gestures.gesture_manager'
 local TouchMgr = require 'dmc_touchmanager'
 
 
@@ -172,12 +178,28 @@ function Gesture._loadPanGestureSupport( params )
 	-- print( "Gesture._loadPanGestureSupport" )
 	if Gesture.Pan then return end
 	--==--
-	local PanGesture = require 'dmc_gesture.pan_gesture'
+	local PanGesture = require 'dmc_gestures.pan_gesture'
 	Gesture.Pan=PanGesture
 end
 
 ---
+
+--- Optional parameters for newPanGesture()
+-- @field id a name for the gesture, available in events
+-- @field delegate a delegate object to control this gesture
+-- @field touches minimum number of taps, default 1
+-- @field max_touches maximum number of taps, default 1
+-- @field threshhold movement required to cancel the tap, default 10
+-- @table newPanParams
+
+
+--- Create a Pan Gesture Recognizer.
+-- creates recognizers which watch for drag/pan gestures
 --
+-- @object view Corona Display object
+-- @tparam[opt] table params @{newPanParams}
+-- @treturn PanGesture a pan gesture object
+-- @usage local g = Gesture.newPanGesture( view )
 --
 function Gesture.newPanGesture( view, params )
 	-- print( "Gesture.newPanGesture", view )
@@ -198,10 +220,27 @@ function Gesture._loadTapGestureSupport( params )
 	-- print( "Gesture._loadTapGestureSupport" )
 	if Gesture.Tap then return end
 	--==--
-	local TapGesture = require 'dmc_gesture.tap_gesture'
+	local TapGesture = require 'dmc_gestures.tap_gesture'
 	Gesture.Tap=TapGesture
 end
 
+--- Optional parameters for newTapGesture()
+-- @field id a name for the gesture, available in events
+-- @field delegate a delegate object to control this gesture
+-- @field accuracy the maximum movement allowed between taps, default 10
+-- @field taps the minimum number of taps required, default 1
+-- @field time maximum time between taps, default 300 ms
+-- @field touches minimum number of touches required, default 1
+-- @table newTapParams
+
+--- Create a Tap Gesture Recognizer.
+-- creates recognizers which watch for tap-type gestures
+--
+-- @object view Corona Display object
+-- @tparam[opt] table params @{newTapParams}
+-- @treturn TapGesture a tap gesture object
+-- @usage local g = Gesture.newTapGesture( view )
+--
 function Gesture.newTapGesture( view, params )
 	-- print( "Gesture.newTapGesture", view )
 	params = params or {}
@@ -214,9 +253,9 @@ function Gesture.newTapGesture( view, params )
 end
 
 
+
 --====================================================================--
 --== Private Functions
-
 
 
 function Gesture._addGestureToManager( gesture )

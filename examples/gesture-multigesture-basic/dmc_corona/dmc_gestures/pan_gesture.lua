@@ -31,6 +31,13 @@ SOFTWARE.
 --]]
 
 
+--- Pan Gesture Module
+-- @module PanGesture
+-- @usage local Gesture = require 'dmc_gestures'
+-- local view = display.newRect( 100, 100, 200, 200 )
+-- local g = Gesture.newPanGesture( view )
+-- g:addEventListener( g.EVENT, gHandler )
+
 
 --====================================================================--
 --== DMC Corona Library : Pan Gesture
@@ -56,7 +63,7 @@ local VERSION = "0.1.0"
 local Objects = require 'dmc_objects'
 local Utils = require 'dmc_utils'
 
-local Continuous = require 'dmc_gesture.core.continuous_gesture'
+local Continuous = require 'dmc_gestures.core.continuous_gesture'
 
 
 
@@ -75,13 +82,35 @@ local mabs = math.abs
 --====================================================================--
 
 
+--- Pan Gesture Recognizer Class.
+-- gestures to recognize drag and pan motions
+--
+-- @type PanGesture
+--
 local PanGesture = newClass( Continuous, { name="Pan Gesture" } )
 
 --== Class Constants
 
 PanGesture.TYPE = 'pan'
 
-PanGesture.MAX_DISTANCE_OFFSET = 10
+PanGesture.MAX_DISTANCE_THRESHHOLD = 10
+
+
+--- Event name constant.
+-- @field EVENT
+-- @usage gesture:addEventListener( gesture.EVENT, handler )
+-- @usage gesture:removeEventListener( gesture.EVENT, handler )
+
+--- Event type constant, gesture recognized.
+-- this type of event is sent out when a Gesture Recognizer has recognized the gesture
+-- @field GESTURE
+-- @usage
+-- local function handler( event )
+-- 	local gesture = event.target
+-- 	if event.type == gesture.GESTURE then
+-- 		-- we have our event !
+-- 	end
+-- end
 
 
 --======================================================--
@@ -92,14 +121,14 @@ function PanGesture:__init__( params )
 	params = params or {}
 	if params.touches==nil then params.touches=1 end
 	if params.max_touches==nil then params.max_touches=params.touches end
-	if params.offset==nil then params.offset=PanGesture.MAX_DISTANCE_OFFSET end
+	if params.threshhold==nil then params.threshhold=PanGesture.MAX_DISTANCE_THRESHHOLD end
 
 	self:superCall( '__init__', params )
 	--==--
 
 	--== Create Properties ==--
 
-	self._offset = params.offset
+	self._threshhold = params.threshhold
 
 	self._max_touches = params.max_touches
 	self._min_touches = params.touches
@@ -117,7 +146,7 @@ function PanGesture:__initComplete__()
 	--== use setters
 	self.max_touches = self._max_touches
 	self.min_touches = self._min_touches
-	self.offset = self._offset
+	self.threshhold = self._threshhold
 end
 
 --[[
@@ -133,32 +162,81 @@ end
 
 
 
+
 --====================================================================--
 --== Public Methods
 
 
+--- Getters and Setters
+-- @section getters-setters
+
+
+--======================================================--
+-- START: bogus methods, copied from super class
+
+--- the gesture's id (string).
+-- this is useful to differentiate between
+-- different gestures attached to the same view object
+--
+-- @function .id
+-- @usage print( gesture.id )
+-- @usage gesture.id = "myid"
+--
+function PanGesture.__gs_id() end
+
+--- the gesture's target view (Display Object).
+--
+-- @function .view
+-- @usage print( gesture.view )
+-- @usage gesture.view = DisplayObject
+--
+function PanGesture.__gs_view() end
+
+--- the gesture's delegate (object/table)
+--
+-- @function .delegate
+-- @usage print( gesture.delegate )
+-- @usage gesture.delegate = DisplayObject
+--
+function PanGesture.__gs_delegate() end
+
+-- END: bogus methods, copied from super class
+--======================================================--
+
+
+
+--- the velocity of the pan gesture motion (number).
+-- Get Only
+-- @function .velocity
+-- @usage print( pan.velocity )
+--
 function PanGesture.__getters:velocity()
 	return self._velocity
 end
 
-function PanGesture.__getters:offset()
-	return self._offset
+
+--- the distance a touch must move to count as the start of a pan (number).
+--
+-- @function .threshhold
+-- @usage print( gesture.threshhold )
+-- @usage gesture.threshhold = 10
+--
+function PanGesture.__getters:threshhold()
+	return self._threshhold
 end
-function PanGesture.__setters:offset( value )
+function PanGesture.__setters:threshhold( value )
 	assert( type(value)=='number' and value>0 and value<256 )
 	--==--
-	self._offset = value
+	self._threshhold = value
 end
 
-function PanGesture.__getters:max_touches()
-	return self._max_touches
-end
-function PanGesture.__setters:max_touches( value )
-	assert( type(value)=='number' and value>0 and value<256 )
-	--==--
-	self._max_touches = value
-end
 
+--- the minimum number of touches to recognize (number).
+--
+-- @function .touches
+-- @usage print( gesture.touches )
+-- @usage gesture.touches = 2
+--
 function PanGesture.__getters:touches()
 	return self._min_touches
 end
@@ -166,6 +244,22 @@ function PanGesture.__setters:touches( value )
 	assert( type(value)=='number' and value>0 and value<256 )
 	--==--
 	self._min_touches = value
+end
+
+
+--- the maximum number of touches to recognize (number).
+--
+-- @function .max_touches
+-- @usage print( gesture.max_touches )
+-- @usage gesture.max_touches = 10
+--
+function PanGesture.__getters:max_touches()
+	return self._max_touches
+end
+function PanGesture.__setters:max_touches( value )
+	assert( type(value)=='number' and value>0 and value<256 )
+	--==--
+	self._max_touches = value
 end
 
 
@@ -198,7 +292,6 @@ function PanGesture:_createGestureEvent( event )
 end
 
 
-
 function PanGesture:_stopFailTimer()
 	-- print( "PanGesture:_stopFailTimer" )
 	if not self._fail_timer then return end
@@ -218,8 +311,6 @@ function PanGesture:_startFailTimer()
 	end
 	self._fail_timer = timer.performWithDelay( time, func )
 end
-
-
 
 
 function PanGesture:_stopPanTimer()
@@ -244,6 +335,13 @@ function PanGesture:_startPanTimer()
 end
 
 
+function PanGesture:_stopAllTimers()
+	self:_stopFailTimer()
+	self:_stopPanTimer()
+end
+
+
+
 --====================================================================--
 --== Event Handlers
 
@@ -256,7 +354,7 @@ function PanGesture:touch( event )
 
 	local _mabs = mabs
 	local phase = event.phase
-	local offset = self._offset
+	local threshhold = self._threshhold
 	local state = self:getState()
 	local t_max = self._max_touches
 	local t_min = self._min_touches
@@ -274,10 +372,10 @@ function PanGesture:touch( event )
 		end
 
 	elseif phase=='moved' then
-		self:_stopPanTimer()
 
 		if state==Continuous.STATE_POSSIBLE then
-			if is_touch_ok and (_mabs(event.xStart-event.x)>offset or _mabs(event.yStart-event.y)>offset) then
+			if is_touch_ok and (_mabs(event.xStart-event.x)>threshhold or _mabs(event.yStart-event.y)>threshhold) then
+				-- self:_stopPanTimer()
 				self:gotoState( Continuous.STATE_BEGAN, event )
 			end
 		elseif state==Continuous.STATE_BEGAN then
@@ -317,7 +415,25 @@ end
 --====================================================================--
 --== State Machine
 
--- none
+
+--== State Recognized ==--
+
+function PanGesture:do_state_began( params )
+	-- print( "PanGesture:do_state_began" )
+	self:_stopAllTimers()
+	Continuous.do_state_began( self, params )
+end
+
+
+--== State Failed ==--
+
+function PanGesture:do_state_failed( params )
+	-- print( "PanGesture:do_state_failed" )
+	self:_stopAllTimers()
+	Continuous.do_state_failed( self, params )
+end
+
+
 
 
 

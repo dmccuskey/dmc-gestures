@@ -103,6 +103,7 @@ Gesture.STATE = 'state-changed-event'
 function Gesture:__init__( params )
 	-- print( "Gesture:__init__", params )
 	params = params or {}
+	-- params.id = params.id
 	-- params.delegate = params.delegate
 
 	self:superCall( StatesMix, '__init__', params )
@@ -204,6 +205,7 @@ end
 
 
 function Gesture:_do_reset()
+	-- print( "Gesture:_do_reset" )
 	self._total_touch_count = 0
 	self._touch_count = 0
 	self._touches = {} -- keyed on ID
@@ -257,6 +259,7 @@ function Gesture:_dispatchGestureNotification( notify )
 		}
 	end
 end
+
 
 -- this one goes to the Gesture Manager
 function Gesture:_dispatchStateNotification( notify )
@@ -318,6 +321,7 @@ function Gesture:_removeTouchEvent( event )
 	self._touch_count = self._touch_count - 1
 	self._touches[ tostring(event.id) ] = nil
 end
+
 
 
 --====================================================================--
@@ -397,7 +401,7 @@ end
 --== State Recognized ==--
 
 function Gesture:do_state_recognized( params )
-	-- print( "Gesture:do_state_recognized" )
+	-- print( "Gesture:do_state_recognized", self._id )
 	params = params or {}
 	if params.notify==nil then params.notify=true end
 	--==--
@@ -422,7 +426,7 @@ end
 --== State Failed ==--
 
 function Gesture:do_state_failed( params )
-	-- print( "Gesture:do_state_failed" )
+	-- print( "Gesture:do_state_failed", self._id )
 	params = params or {}
 	if params.notify==nil then params.notify=true end
 	--==--

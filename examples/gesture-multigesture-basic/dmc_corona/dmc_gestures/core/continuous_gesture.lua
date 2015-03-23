@@ -55,7 +55,7 @@ local VERSION = "0.1.0"
 
 local Objects = require 'dmc_objects'
 
-local Gesture = require 'dmc_gesture.core.gesture'
+local Gesture = require 'dmc_gestures.core.gesture'
 
 
 --====================================================================--
@@ -322,6 +322,19 @@ end
 
 
 --== State Recognized ==--
+
+function Continuous:do_state_recognized( params )
+	-- print( "Continuous:do_state_recognized", self._id )
+	params = params or {}
+	if params.notify==nil then params.notify=true end
+	--==--
+	self:setState( Continuous.STATE_RECOGNIZED )
+	self:_dispatchStateNotification( params.notify )
+	self:_dispatchRecognizedEvent()
+end
+
+
+--== State Canceled ==--
 
 function Continuous:do_state_canceled( params )
 	-- print( "Continuous:do_state_canceled" )
