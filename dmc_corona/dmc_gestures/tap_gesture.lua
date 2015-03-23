@@ -56,7 +56,7 @@ local VERSION = "0.1.0"
 local Objects = require 'dmc_objects'
 local Utils = require 'dmc_utils'
 
-local Gesture = require 'dmc_gesture.core.gesture'
+local Gesture = require 'dmc_gestures.core.gesture'
 
 
 

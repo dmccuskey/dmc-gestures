@@ -56,7 +56,7 @@ local VERSION = "0.1.0"
 local Objects = require 'dmc_objects'
 local Utils = require 'dmc_utils'
 
-local Continuous = require 'dmc_gesture.core.continuous_gesture'
+local Continuous = require 'dmc_gestures.core.continuous_gesture'
 
 
 

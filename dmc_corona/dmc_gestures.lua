@@ -125,7 +125,7 @@ local dmc_gesture_data = Utils.extend( dmc_lib_data.dmc_gesture, DMC_GESTURE_DEF
 --== Imports
 
 
-local GestureMgr = require 'dmc_gesture.gesture_manager'
+local GestureMgr = require 'dmc_gestures.gesture_manager'
 local TouchMgr = require 'dmc_touchmanager'
 
 
@@ -172,7 +172,7 @@ function Gesture._loadPanGestureSupport( params )
 	-- print( "Gesture._loadPanGestureSupport" )
 	if Gesture.Pan then return end
 	--==--
-	local PanGesture = require 'dmc_gesture.pan_gesture'
+	local PanGesture = require 'dmc_gestures.pan_gesture'
 	Gesture.Pan=PanGesture
 end
 
@@ -198,7 +198,7 @@ function Gesture._loadTapGestureSupport( params )
 	-- print( "Gesture._loadTapGestureSupport" )
 	if Gesture.Tap then return end
 	--==--
-	local TapGesture = require 'dmc_gesture.tap_gesture'
+	local TapGesture = require 'dmc_gestures.tap_gesture'
 	Gesture.Tap=TapGesture
 end
 
