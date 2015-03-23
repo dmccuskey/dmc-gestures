@@ -82,8 +82,8 @@ local TapGesture = newClass( Gesture, { name="Tap Gesture" } )
 
 TapGesture.TYPE = 'tap'
 
-TapGesture.MAX_TIME_INTERVAL = 300
 TapGesture.MAX_DISTANCE_OFFSET = 10
+TapGesture.MAX_TAP_THRESHHOLD = 300
 
 
 --======================================================--
@@ -94,7 +94,7 @@ function TapGesture:__init__( params )
 	params = params or {}
 	if params.offset==nil then params.offset=TapGesture.MAX_DISTANCE_OFFSET end
 	if params.taps==nil then params.taps=1 end
-	if params.time==nil then params.time=TapGesture.MAX_TIME_INTERVAL end
+	if params.time==nil then params.time=TapGesture.MAX_TAP_THRESHHOLD end
 	if params.touches==nil then params.touches=1 end
 
 	self:superCall( '__init__', params )
