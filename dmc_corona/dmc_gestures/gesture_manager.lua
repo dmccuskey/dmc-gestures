@@ -208,36 +208,6 @@ function GestureMgr:_resetGestures( params )
 	self:_resetPossibleGestures()
 end
 
--- _processBeganTouchEvent()
--- gives Began Touch Event to Possible Gestures
--- checks delegate to see if ok
---
-function GestureMgr:_processBeganTouchEvent( event )
-	-- print("GestureMgr:_processBeganTouchEvent", event )
-	local active = self._active
-	for i=#active, 1, -1 do
-		local g = active[i]
-
-		if g:shouldReceiveTouch() then
-			g:touch( event )
-		else
-			self:_removeActiveGesture( g )
-		end
-	end
-end
-
--- _processTouchEvent()
--- gives Touch Event to Possible Gestures
---
-function GestureMgr:_processTouchEvent( event )
-	-- print("GestureMgr:_processTouchEvent", event.phase )
-	local active = self._active
-	for i=#active, 1, -1 do
-		local g = active[i]
-		if g then g:touch( event ) end
-	end
-end
-
 
 -- _removeActiveGesture()
 -- remove Gesture from remaining Possible Gestures
@@ -269,6 +239,47 @@ function GestureMgr:_failOtherGestures( gesture )
 				tremove( active, i )
 			end
 		end
+	end
+end
+
+
+-- _processBeganTouchEvent()
+-- gives Began Touch Event to Possible Gestures
+-- checks delegate to see if ok
+--
+function GestureMgr:_processBeganTouchEvent( event )
+	-- print("GestureMgr:_processBeganTouchEvent", event )
+	local active = self._active
+	for i=#active, 1, -1 do
+		local g = active[i]
+
+		if g:shouldReceiveTouch() then
+			g:touch( event )
+		else
+			self:_removeActiveGesture( g )
+		end
+	end
+end
+
+-- _processTouchEvent()
+-- gives Touch Event to Possible Gestures
+--
+function GestureMgr:_processTouchEvent( event )
+	-- print("GestureMgr:_processTouchEvent", event.phase )
+	local active = self._active
+	for i=#active, 1, -1 do
+		local g = active[i]
+		if g then g:touch( event ) end
+	end
+end
+
+
+function GestureMgr:_processTouchEvent( event )
+	-- print("GestureMgr:_processTouchEvent", event.phase )
+	local active = self._active
+	for i=#active, 1, -1 do
+		local g = active[i]
+		if g then g:touch( event ) end
 	end
 end
 
