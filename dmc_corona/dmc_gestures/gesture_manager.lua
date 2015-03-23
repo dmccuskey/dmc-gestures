@@ -277,8 +277,8 @@ function GestureMgr:_processQuarantine( quarantine, gestures )
 			target=te.target,
 			time=te.time,
 			x=te.x, y=te.y,
-			xStart=te.xStart,
-			yStart=te.yStart,
+			xStart=te.x,
+			yStart=te.y,
 		}
 		tinsert( queue, ne )
 	end
