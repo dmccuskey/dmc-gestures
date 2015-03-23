@@ -18,7 +18,7 @@ print( '\n\n##############################################\n\n' )
 --== Imports
 
 
-local Gesture = require 'dmc_corona.dmc_gesture'
+local Gesture = require 'dmc_corona.dmc_gestures'
 
 
 
