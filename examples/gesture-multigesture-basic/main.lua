@@ -1,7 +1,7 @@
 --====================================================================--
--- Gesture Pan Basic
+-- Gesture Multi Basic
 --
--- Shows simple use of Pan gesture
+-- Shows stacking different gestures
 --
 -- Sample code is MIT licensed, the same license which covers Lua itself
 -- http://en.wikipedia.org/wiki/MIT_License
