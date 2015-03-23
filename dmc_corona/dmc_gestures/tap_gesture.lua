@@ -284,6 +284,7 @@ function TapGesture:touch( event )
 		local taps = self._tap_count
 		if self._tap_timer and touch_count==0 then
 			taps = taps + 1
+			self:_stopTapTimer()
 		end
 		if taps==r_taps then
 			self:gotoState( TapGesture.STATE_RECOGNIZED )
