@@ -215,7 +215,7 @@ local function createMasterTouchHandler( master_data )
 		if phase=='began' then
 
 			if g_mgr.shouldDelayBeganTouches then
-
+				-- pass, TODO
 			else
 				sendEventToListeners( event, listeners )
 			end
@@ -223,7 +223,7 @@ local function createMasterTouchHandler( master_data )
 		elseif phase=='moved' then
 
 			if g_mgr.shouldDelayBeganTouches then
-
+				-- pass, TODO
 			else
 				sendEventToListeners( event, listeners )
 			end
@@ -232,7 +232,7 @@ local function createMasterTouchHandler( master_data )
 		elseif phase=='ended' or phase=='canceled' then
 
 			if g_mgr.shouldDelayEndedTouches then
-
+				-- pass, TODO
 			else
 				sendEventToListeners( event, listeners )
 			end
