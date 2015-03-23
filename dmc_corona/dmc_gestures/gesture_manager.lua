@@ -227,7 +227,7 @@ end
 -- does not fail, gesture stops receiving Touch notifications
 --
 function GestureMgr:_removeActiveGesture( gesture )
-	-- print("GestureMgr:_removeActiveGesture" )
+	-- print("GestureMgr:_removeActiveGesture", gesture._id )
 	local active = self._active
 	for i=#active, 1, -1 do
 		local g = active[i]
@@ -242,7 +242,7 @@ end
 -- Fail remaining Gestures after getting Recognized notification
 --
 function GestureMgr:_failOtherGestures( gesture )
-	-- print("GestureMgr:_failOtherGestures" )
+	-- print("GestureMgr:_failOtherGestures",gesture._id )
 	local active = self._active
 	for i=#active, 1, -1 do
 		local g = active[i]

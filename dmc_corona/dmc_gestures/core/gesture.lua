@@ -401,7 +401,7 @@ end
 --== State Recognized ==--
 
 function Gesture:do_state_recognized( params )
-	-- print( "Gesture:do_state_recognized" )
+	-- print( "Gesture:do_state_recognized", self._id )
 	params = params or {}
 	if params.notify==nil then params.notify=true end
 	--==--
@@ -426,7 +426,7 @@ end
 --== State Failed ==--
 
 function Gesture:do_state_failed( params )
-	-- print( "Gesture:do_state_failed" )
+	-- print( "Gesture:do_state_failed", self._id )
 	params = params or {}
 	if params.notify==nil then params.notify=true end
 	--==--
