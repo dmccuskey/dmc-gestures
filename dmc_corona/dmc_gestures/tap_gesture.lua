@@ -290,6 +290,8 @@ function TapGesture:touch( event )
 			self:gotoState( TapGesture.STATE_RECOGNIZED )
 		elseif taps>r_taps then
 			self:gotoState( TapGesture.STATE_FAILED )
+		else
+			self:_startFailTimer()
 		end
 		self._tap_count = taps
 	end
