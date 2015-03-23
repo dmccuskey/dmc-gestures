@@ -335,6 +335,12 @@ function PanGesture:_startPanTimer()
 end
 
 
+function PanGesture:_stopAllTimers()
+	self:_stopFailTimer()
+	self:_stopPanTimer()
+end
+
+
 
 --====================================================================--
 --== Event Handlers
@@ -366,10 +372,10 @@ function PanGesture:touch( event )
 		end
 
 	elseif phase=='moved' then
-		self:_stopPanTimer()
 
 		if state==Continuous.STATE_POSSIBLE then
 			if is_touch_ok and (_mabs(event.xStart-event.x)>threshhold or _mabs(event.yStart-event.y)>threshhold) then
+				-- self:_stopPanTimer()
 				self:gotoState( Continuous.STATE_BEGAN, event )
 			end
 		elseif state==Continuous.STATE_BEGAN then
@@ -409,7 +415,25 @@ end
 --====================================================================--
 --== State Machine
 
--- none
+
+--== State Recognized ==--
+
+function PanGesture:do_state_began( params )
+	-- print( "PanGesture:do_state_began" )
+	self:_stopAllTimers()
+	Continuous.do_state_began( self, params )
+end
+
+
+--== State Failed ==--
+
+function PanGesture:do_state_failed( params )
+	-- print( "PanGesture:do_state_failed" )
+	self:_stopAllTimers()
+	Continuous.do_state_failed( self, params )
+end
+
+
 
 
 
