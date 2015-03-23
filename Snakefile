@@ -1,24 +1,24 @@
-# dmc-gesture
+# dmc-gestures
 
 try:
 	if not gSTARTED: print( gSTARTED )
 except:
-	MODULE = "dmc-gesture"
+	MODULE = "dmc-gestures"
 	include: "../DMC-Corona-Library/snakemake/Snakefile"
 
 module_config = {
-	"name": "dmc-gesture",
+	"name": "dmc-gestures",
 	"module": {
 		"dir": "dmc_corona",
 		"files": [
-			"dmc_gesture.lua",
-			"dmc_gesture/core/gesture.lua",
-			"dmc_gesture/core/continuous_gesture.lua",
-			"dmc_gesture/gesture_manager.lua",
-			"dmc_gesture/pan_gesture.lua",
-			#"dmc_gesture/pinch_gesture.lua",
-			#"dmc_gesture/swipe_gesture.lua",
-			"dmc_gesture/tap_gesture.lua",
+			"dmc_gestures.lua",
+			"dmc_gestures/core/gesture.lua",
+			"dmc_gestures/core/continuous_gesture.lua",
+			"dmc_gestures/gesture_manager.lua",
+			"dmc_gestures/pan_gesture.lua",
+			#"dmc_gestures/pinch_gesture.lua",
+			#"dmc_gestures/swipe_gesture.lua",
+			"dmc_gestures/tap_gesture.lua",
 		],
 		"requires": [
 			"dmc-corona-boot",
@@ -51,5 +51,5 @@ module_config = {
 	}
 }
 
-register( "dmc-gesture", module_config )
+register( "dmc-gestures", module_config )
 
