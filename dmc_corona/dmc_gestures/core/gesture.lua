@@ -103,6 +103,7 @@ Gesture.STATE = 'state-changed-event'
 function Gesture:__init__( params )
 	-- print( "Gesture:__init__", params )
 	params = params or {}
+	-- params.id = params.id
 	-- params.delegate = params.delegate
 
 	self:superCall( StatesMix, '__init__', params )
@@ -259,6 +260,7 @@ function Gesture:_dispatchGestureNotification( notify )
 	end
 end
 
+
 -- this one goes to the Gesture Manager
 function Gesture:_dispatchStateNotification( notify )
 	-- print("Gesture:_dispatchStateNotification" )
@@ -319,6 +321,7 @@ function Gesture:_removeTouchEvent( event )
 	self._touch_count = self._touch_count - 1
 	self._touches[ tostring(event.id) ] = nil
 end
+
 
 
 --====================================================================--
