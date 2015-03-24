@@ -1,8 +1,9 @@
-# dmc-gesture
+# dmc-gestures
 
 
 `dmc-gestures` is a module for creating Gesture Recognizers which will watch for gestures performed on an object. The module is modeled after iOS Gesture Recognizers.
 
+This module is also included in the more comprehensive [DMC Corona Library repo](https://github.com/dmccuskey/DMC-Corona-Library).
 
 
 ## General Usage
