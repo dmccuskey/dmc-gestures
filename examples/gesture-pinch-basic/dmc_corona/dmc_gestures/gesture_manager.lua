@@ -401,8 +401,6 @@ function GestureMgr:touch( event )
 	local quarantine = self._quarantine
 	local queue = self._queue
 
-	-- Utils.print( event )
-
 	if phase=='began' then
 		self._t_active=self._t_active+1
 		self._touch_mgr.setFocus( target, event.id )

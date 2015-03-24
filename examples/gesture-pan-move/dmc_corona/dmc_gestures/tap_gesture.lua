@@ -93,7 +93,7 @@ local TapGesture = newClass( Gesture, { name="Tap Gesture" } )
 
 TapGesture.TYPE = 'tap'
 
-TapGesture.MAX_TAP_THRESHHOLD = 300
+TapGesture.MAX_TAP_THRESHOLD = 300
 TapGesture.MIN_ACCURACY = 10
 
 
@@ -122,7 +122,7 @@ function TapGesture:__init__( params )
 	params = params or {}
 	if params.accuracy==nil then params.accuracy=TapGesture.MIN_ACCURACY end
 	if params.taps==nil then params.taps=1 end
-	if params.time==nil then params.time=TapGesture.MAX_TAP_THRESHHOLD end
+	if params.time==nil then params.time=TapGesture.MAX_TAP_THRESHOLD end
 	if params.touches==nil then params.touches=1 end
 
 	self:superCall( '__init__', params )

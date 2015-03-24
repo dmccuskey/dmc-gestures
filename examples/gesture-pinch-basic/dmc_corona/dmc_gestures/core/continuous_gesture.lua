@@ -269,7 +269,7 @@ end
 --== State Began ==--
 
 function Continuous:do_state_began( params )
-	print( "Continuous:do_state_began", params )
+	-- print( "Continuous:do_state_began", params )
 	params = params or {}
 	if params.notify==nil then params.notify=true end
 	--==--
@@ -293,7 +293,7 @@ end
 --== State Changed ==--
 
 function Continuous:do_state_changed( params )
-	print( "Continuous:do_state_changed" )
+	-- print( "Continuous:do_state_changed" )
 	params = params or {}
 	if params.notify==nil then params.notify=true end
 	--==--
@@ -324,7 +324,7 @@ end
 --== State Recognized ==--
 
 function Continuous:do_state_recognized( params )
-	print( "Continuous:do_state_recognized", self._id )
+	-- print( "Continuous:do_state_recognized", self._id )
 	params = params or {}
 	if params.notify==nil then params.notify=true end
 	--==--

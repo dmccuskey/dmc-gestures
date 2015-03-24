@@ -189,7 +189,7 @@ end
 -- @field delegate a delegate object to control this gesture
 -- @field touches minimum number of taps, default 1
 -- @field max_touches maximum number of taps, default 1
--- @field threshhold movement required to cancel the tap, default 10
+-- @field threshold movement required to cancel the tap, default 10
 -- @table newPanParams
 
 

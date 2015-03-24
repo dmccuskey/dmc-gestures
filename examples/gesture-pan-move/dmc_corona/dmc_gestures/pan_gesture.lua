@@ -93,7 +93,7 @@ local PanGesture = newClass( Continuous, { name="Pan Gesture" } )
 
 PanGesture.TYPE = 'pan'
 
-PanGesture.MAX_DISTANCE_THRESHHOLD = 10
+PanGesture.MAX_DISTANCE_THRESHOLD = 10
 
 
 --- Event name constant.
@@ -121,14 +121,14 @@ function PanGesture:__init__( params )
 	params = params or {}
 	if params.touches==nil then params.touches=1 end
 	if params.max_touches==nil then params.max_touches=params.touches end
-	if params.threshhold==nil then params.threshhold=PanGesture.MAX_DISTANCE_THRESHHOLD end
+	if params.threshold==nil then params.threshold=PanGesture.MAX_DISTANCE_THRESHOLD end
 
 	self:superCall( '__init__', params )
 	--==--
 
 	--== Create Properties ==--
 
-	self._threshhold = params.threshhold
+	self._threshold = params.threshold
 
 	self._max_touches = params.max_touches
 	self._min_touches = params.touches
@@ -146,7 +146,7 @@ function PanGesture:__initComplete__()
 	--== use setters
 	self.max_touches = self._max_touches
 	self.min_touches = self._min_touches
-	self.threshhold = self._threshhold
+	self.threshold = self._threshold
 end
 
 --[[
@@ -217,17 +217,17 @@ end
 
 --- the distance a touch must move to count as the start of a pan (number).
 --
--- @function .threshhold
--- @usage print( gesture.threshhold )
--- @usage gesture.threshhold = 10
+-- @function .threshold
+-- @usage print( gesture.threshold )
+-- @usage gesture.threshold = 10
 --
-function PanGesture.__getters:threshhold()
-	return self._threshhold
+function PanGesture.__getters:threshold()
+	return self._threshold
 end
-function PanGesture.__setters:threshhold( value )
+function PanGesture.__setters:threshold( value )
 	assert( type(value)=='number' and value>0 and value<256 )
 	--==--
-	self._threshhold = value
+	self._threshold = value
 end
 
 
@@ -354,7 +354,7 @@ function PanGesture:touch( event )
 
 	local _mabs = mabs
 	local phase = event.phase
-	local threshhold = self._threshhold
+	local threshold = self._threshold
 	local state = self:getState()
 	local t_max = self._max_touches
 	local t_min = self._min_touches
@@ -374,7 +374,7 @@ function PanGesture:touch( event )
 	elseif phase=='moved' then
 
 		if state==Continuous.STATE_POSSIBLE then
-			if is_touch_ok and (_mabs(event.xStart-event.x)>threshhold or _mabs(event.yStart-event.y)>threshhold) then
+			if is_touch_ok and (_mabs(event.xStart-event.x)>threshold or _mabs(event.yStart-event.y)>threshold) then
 				-- self:_stopPanTimer()
 				self:gotoState( Continuous.STATE_BEGAN, event )
 			end
