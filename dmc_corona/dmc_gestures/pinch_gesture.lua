@@ -249,7 +249,7 @@ function PinchGesture.__setters:threshold( value )
 end
 
 
---- whether to reset internal scale after pinch gesture is finished (boolean).
+--- max time allowed to recognize the gesture (number).
 --
 -- @function .time_limit
 -- @usage print( gesture.time_limit )
@@ -259,7 +259,7 @@ function PinchGesture.__getters:time_limit()
 	return self._time_limit
 end
 function PinchGesture.__setters:time_limit( value )
-	assert( type(value)=='boolean' )
+	assert( type(value)=='number' and value>50 )
 	--==--
 	self._time_limit = value
 end

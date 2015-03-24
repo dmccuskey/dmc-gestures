@@ -93,7 +93,7 @@ local PanGesture = newClass( Continuous, { name="Pan Gesture" } )
 
 PanGesture.TYPE = 'pan'
 
-PanGesture.MAX_DISTANCE_THRESHOLD = 10
+PanGesture.MIN_DISTANCE_THRESHOLD = 10
 
 
 --- Event name constant.
@@ -121,7 +121,7 @@ function PanGesture:__init__( params )
 	params = params or {}
 	if params.touches==nil then params.touches=1 end
 	if params.max_touches==nil then params.max_touches=params.touches end
-	if params.threshold==nil then params.threshold=PanGesture.MAX_DISTANCE_THRESHOLD end
+	if params.threshold==nil then params.threshold=PanGesture.MIN_DISTANCE_THRESHOLD end
 
 	self:superCall( '__init__', params )
 	--==--
