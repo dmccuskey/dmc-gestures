@@ -189,7 +189,7 @@ end
 -- @field delegate a delegate object to control this gesture
 -- @field touches minimum number of taps, default 1
 -- @field max_touches maximum number of taps, default 1
--- @field threshhold movement required to cancel the tap, default 10
+-- @field threshold movement required to recognize the tap, default 10
 -- @table newPanParams
 
 
@@ -208,6 +208,47 @@ function Gesture.newPanGesture( view, params )
 	--==--
 	if not Gesture.Pan then Gesture._loadPanGestureSupport() end
 	local o = Gesture.Pan:new( params )
+	Gesture._addGestureToManager( o )
+	return o
+end
+
+
+--======================================================--
+-- newPinchGesture Support
+
+function Gesture._loadPinchGestureSupport( params )
+	-- print( "Gesture._loadPinchGestureSupport" )
+	if Gesture.Pinch then return end
+	--==--
+	local newPinchGesture = require 'dmc_gestures.pinch_gesture'
+	Gesture.Pinch=newPinchGesture
+end
+
+
+--- Optional parameters for newPinchGesture()
+-- @field id a name for the gesture, available in events
+-- @field delegate a delegate object to control this gesture
+-- @field reset_scale boolean, reset scale to 1.0 after pinch, default true
+-- @field threshold @{number} touch movement required to recognize the gesture, default 5
+-- @field time_limit @{number} max time allowed to recognize the gesture, default 500ms
+-- @table newPinchParams
+
+
+--- Create a Pinch Gesture Recognizer.
+-- creates recognizers which watch for pinch gestures, eg for zoom
+--
+-- @object view Corona Display object
+-- @tparam[opt] table params @{newPinchParams}
+-- @treturn PinchGesture a pan gesture object
+-- @usage local g = Gesture.newPinchGesture( view )
+--
+function Gesture.newPinchGesture( view, params )
+	-- print( "Gesture.newPinchGesture", view )
+	params = params or {}
+	params.view = view
+	--==--
+	if not Gesture.Pinch then Gesture._loadPinchGestureSupport() end
+	local o = Gesture.Pinch:new( params )
 	Gesture._addGestureToManager( o )
 	return o
 end
