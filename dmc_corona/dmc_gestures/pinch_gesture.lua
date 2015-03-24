@@ -472,7 +472,7 @@ function PinchGesture:touch( event )
 			end
 		end
 
-	elseif phase=='canceled' then
+	elseif phase=='cancelled' then
 		self:gotoState( PinchGesture.STATE_FAILED  )
 
 	else -- ended

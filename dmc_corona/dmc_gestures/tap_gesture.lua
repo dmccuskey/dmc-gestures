@@ -369,7 +369,7 @@ function TapGesture:touch( event )
 			self:gotoState( TapGesture.STATE_FAILED )
 		end
 
-	elseif phase=='canceled' then
+	elseif phase=='cancelled' then
 		self:gotoState( TapGesture.STATE_FAILED )
 
 	else -- ended

@@ -229,7 +229,7 @@ local function createMasterTouchHandler( master_data )
 			end
 
 
-		elseif phase=='ended' or phase=='canceled' then
+		elseif phase=='ended' or phase=='cancelled' then
 
 			if g_mgr.shouldDelayEndedTouches then
 				-- pass, TODO

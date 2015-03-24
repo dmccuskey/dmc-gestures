@@ -335,7 +335,7 @@ function Gesture:touch( event )
 		self:_createTouchEvent( event )
 	elseif phase=='moved' then
 		self:_updateTouchEvent( event )
-	elseif phase=='canceled' or phase=='ended' then
+	elseif phase=='cancelled' or phase=='ended' then
 	self:_removeTouchEvent( event )
 	end
 end

@@ -390,7 +390,7 @@ function PanGesture:touch( event )
 			end
 		end
 
-	elseif phase=='canceled' then
+	elseif phase=='cancelled' then
 		self:gotoState( PanGesture.STATE_FAILED  )
 
 	else -- ended

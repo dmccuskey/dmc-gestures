@@ -81,7 +81,7 @@ Continuous.TYPE = nil -- override this
 
 Continuous.STATE_BEGAN = 'state_began'
 Continuous.STATE_CHANGED = 'state_changed'
-Continuous.STATE_CANCELED = 'state_canceled'
+Continuous.STATE_CANCELED = 'state_cancelled'
 
 --== Event Constants
 
@@ -310,7 +310,7 @@ function Continuous:state_changed( next_state, params )
 		self:do_state_changed( params )
 
 	elseif next_state == Continuous.STATE_CANCELED then
-		self:do_state_canceled( params )
+		self:do_state_cancelled( params )
 
 	elseif next_state == Continuous.STATE_RECOGNIZED then
 		self:do_state_recognized( params )
@@ -336,8 +336,8 @@ end
 
 --== State Canceled ==--
 
-function Continuous:do_state_canceled( params )
-	-- print( "Continuous:do_state_canceled" )
+function Continuous:do_state_cancelled( params )
+	-- print( "Continuous:do_state_cancelled" )
 	params = params or {}
 	if params.notify==nil then params.notify=true end
 	--==--
@@ -346,14 +346,14 @@ function Continuous:do_state_canceled( params )
 	self:_dispatchStateNotification( params.notify )
 end
 
-function Continuous:state_canceled( next_state, params )
-	-- print( "Continuous:state_canceled: >> ", next_state )
+function Continuous:state_cancelled( next_state, params )
+	-- print( "Continuous:state_cancelled: >> ", next_state )
 
 	if next_state == Continuous.STATE_POSSIBLE then
 		self:do_state_possible( params )
 
 	else
-		print( "WARNING :: Continuous:state_canceled " .. tostring( next_state ) )
+		print( "WARNING :: Continuous:state_cancelled " .. tostring( next_state ) )
 	end
 end
 

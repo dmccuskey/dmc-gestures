@@ -413,13 +413,13 @@ function GestureMgr:touch( event )
 	-- @TODO, check this
 	if self._t_active==0 then return end
 
-	-- moved/ended/canceled
+	-- moved/ended/cancelled
 	if phase=='moved' then
 		if not quarantine or not self:_checkQuarantine( quarantine, event ) then
 			tinsert( queue, event )
 		end
 
-	elseif phase=='ended' or phase=='canceled' then
+	elseif phase=='ended' or phase=='cancelled' then
 		if not quarantine or not self:_checkQuarantine( quarantine, event ) then
 			tinsert( queue, event )
 		end
