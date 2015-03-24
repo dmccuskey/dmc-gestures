@@ -185,11 +185,11 @@ end
 ---
 
 --- Optional parameters for newPanGesture()
--- @field id a name for the gesture, available in events
--- @field delegate a delegate object to control this gesture
--- @field touches minimum number of taps, default 1
--- @field max_touches maximum number of taps, default 1
--- @field threshold movement required to recognize the tap, default 10
+-- @string id a name for the gesture, available in events
+-- @object delegate a delegate object to control this gesture
+-- @int touches minimum number of taps, default 1
+-- @int max_touches maximum number of taps, default 1
+-- @int threshold movement required to recognize the tap, default 10
 -- @table newPanParams
 
 
@@ -226,11 +226,11 @@ end
 
 
 --- Optional parameters for newPinchGesture()
--- @field id a name for the gesture, available in events
--- @field delegate a delegate object to control this gesture
--- @field reset_scale boolean, reset scale to 1.0 after pinch, default true
--- @field threshold @{number} touch movement required to recognize the gesture, default 5
--- @field time_limit @{number} max time allowed to recognize the gesture, default 500ms
+-- @string id a name for the gesture, available in events
+-- @object delegate a delegate object to control this gesture
+-- @boolean reset_scale reset scale to 1.0 after pinch, default true
+-- @int threshold touch movement required to recognize the gesture, default 5
+-- @int time_limit max time allowed to recognize the gesture, default 500ms
 -- @table newPinchParams
 
 
@@ -266,12 +266,12 @@ function Gesture._loadTapGestureSupport( params )
 end
 
 --- Optional parameters for newTapGesture()
--- @field id a name for the gesture, available in events
--- @field delegate a delegate object to control this gesture
--- @field accuracy the maximum movement allowed between taps, default 10
--- @field taps the minimum number of taps required, default 1
--- @field time maximum time between taps, default 300 ms
--- @field touches minimum number of touches required, default 1
+-- @string id a name for the gesture, available in events
+-- @object delegate a delegate object to control this gesture
+-- @int accuracy the maximum movement allowed between taps, default 10
+-- @int taps the minimum number of taps required, default 1
+-- @int time maximum time between taps, default 300 ms
+-- @int touches minimum number of touches required, default 1
 -- @table newTapParams
 
 --- Create a Tap Gesture Recognizer.

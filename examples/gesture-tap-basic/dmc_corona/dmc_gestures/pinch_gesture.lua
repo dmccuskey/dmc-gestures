@@ -265,10 +265,11 @@ function PinchGesture.__setters:time_limit( value )
 end
 
 
---- the velocity of the pan gesture motion (number).
+-- @TODO
+-- the velocity of the gesture motion (number).
 -- Get Only
 -- @function .velocity
--- @usage print( pan.velocity )
+-- @usage print( gesture.velocity )
 --
 function PinchGesture.__getters:velocity()
 	return self._velocity
