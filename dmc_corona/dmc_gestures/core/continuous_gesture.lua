@@ -284,6 +284,10 @@ function Continuous:state_began( next_state, params )
 
 	if next_state == Continuous.STATE_CHANGED then
 		self:do_state_changed( params )
+
+	elseif next_state == Continuous.STATE_RECOGNIZED then
+		self:do_state_recognized( params )
+
 	else
 		print( "WARNING :: Continuous:state_began " .. tostring( next_state ) )
 	end
