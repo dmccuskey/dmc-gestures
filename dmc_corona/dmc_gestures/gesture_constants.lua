@@ -93,4 +93,18 @@ Constant.PAN_THRESHOLD = 10
 Constant.PAN_TOUCHES = 1
 
 
+--======================================================--
+-- Tap Gesture
+
+Constant.TYPE_TAP = 'tap'
+
+--== Defaults
+
+Constant.TAP_ACCURACY = 10
+Constant.TAP_TAPS = 1
+Constant.TAP_TOUCHES = 1
+
+
+
+
 return Constant
