@@ -343,7 +343,7 @@ function LongPressGesture:touch( event )
 		local taps = self._tap_count
 
 		self:_startFailTimer()
-		self._gesture_started=true
+		self._gesture_attempt=true
 
 		if is_touch_ok and taps==r_taps then
 			self:_addMultitouchToQueue( Continuous.BEGAN )
@@ -392,7 +392,7 @@ function LongPressGesture:touch( event )
 				taps = taps + 1
 				self:_stopGestureTimer()
 			end
-			if self._gesture_started then
+			if self._gesture_attempt then
 				-- remove these touch events so they
 				-- are not used in Centroid calculation
 				self:_removeTouchEvent( event )

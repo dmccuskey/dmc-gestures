@@ -133,7 +133,7 @@ function Gesture:__init__( params )
 	self._touches = {} -- keyed on ID
 	self._multitouch_evt = nil
 	self._multitouch_queue = {}
-	self._gesture_started=false
+	self._gesture_attempt=false
 	self._gesture_timer=nil
 	self._fail_timer=nil
 
@@ -220,7 +220,7 @@ function Gesture:_do_reset()
 	self._touches = {} -- keyed on ID
 	self._multitouch_evt = nil
 	self._multitouch_queue = {}
-	self._gesture_started=false
+	self._gesture_attempt=false
 	self:_stopAllTimers()
 end
 
