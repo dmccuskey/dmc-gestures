@@ -29,8 +29,7 @@ local W, H = display.contentWidth, display.contentHeight
 local H_CENTER, V_CENTER = W*0.5, H*0.5
 
 
-local txt_display, txt_display_t
-local timer_t
+local txt_display, txt_display_t, timer_t
 local circle
 
 
@@ -68,21 +67,6 @@ local function setupUI()
 end
 
 
-local function gestureEvent_handler( event )
-	-- print( "gestureEvent_handler", event.phase )
-	if event.type == event.target.GESTURE then
-		if event.phase=='began' then
-			circle = display.newCircle( event.x, event.y, 10 )
-		elseif event.phase=='changed' then
-			circle.x, circle.y = event.x, event.y
-		else
-			if circle then circle:removeSelf() ; circle=nil end
-		end
-		displayFeedback( "Gesture: "..tostring(event.id) )
-	end
-end
-
-
 
 --====================================================================--
 --== Main
@@ -92,6 +76,21 @@ end
 local function main()
 
 	local view, pan, tap
+
+
+	local function gestureEvent_handler( event )
+		-- print( "gestureEvent_handler", event.phase )
+		if event.type == event.target.GESTURE then
+			if event.phase=='began' then
+				circle = display.newCircle( event.x, event.y, 10 )
+			elseif event.phase=='changed' then
+				circle.x, circle.y = event.x, event.y
+			else
+				if circle then circle:removeSelf() ; circle=nil end
+			end
+			displayFeedback( "Gesture: "..tostring(event.id) )
+		end
+	end
 
 	-- create touch area for gestures
 
