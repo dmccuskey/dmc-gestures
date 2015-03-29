@@ -69,6 +69,9 @@ local ObjectBase = Objects.ObjectBase
 
 local StatesMix = StatesMixModule.StatesMix
 
+local tcancel = timer.cancel
+local tdelay = timer.performWithDelay
+local tstr = tostring
 
 
 --====================================================================--
@@ -255,6 +258,9 @@ end
 --== Private Methods
 
 
+--======================================================--
+-- Event Dispatch
+
 -- this one goes to the Gesture Manager
 function Gesture:_dispatchGestureNotification( notify )
 	-- print("Gesture:_dispatchGestureNotification", notify )
@@ -360,7 +366,7 @@ function Gesture:_createTouchEvent( event )
 	-- print( "Gesture:_createTouchEvent", event, self )
 	self._total_touch_count = self._total_touch_count + 1
 	self._touch_count = self._touch_count + 1
-	self._touches[ tostring(event.id) ] = {
+	self._touches[ tstr(event.id) ] = {
 		id=event.id,
 		name=event.name,
 		target=event.target,
@@ -376,7 +382,7 @@ end
 function Gesture:_updateTouchEvent( event )
 	-- print( "Gesture:_updateTouchEvent" )
 	for id, evt in pairs( self._touches ) do
-		if id==tostring(event.id) then
+		if id==tstr(event.id) then
 			evt.x, evt.y = event.x, event.y
 			evt.phase = event.phase
 		else
@@ -432,7 +438,7 @@ function Gesture:state_create( next_state, params )
 	elseif next_state == Gesture.STATE_FAILED then
 		self:do_state_failed( params )
 	else
-		print( "WARNING :: Gesture:state_create " .. tostring( next_state ) )
+		print( "WARNING :: Gesture:state_create " .. tstr( next_state ) )
 	end
 end
 
@@ -469,7 +475,7 @@ function Gesture:state_possible( next_state, params )
 		self:do_state_possible( params )
 
 	else
-		print( "WARNING :: Gesture:state_possible " .. tostring( next_state ) )
+		print( "WARNING :: Gesture:state_possible " .. tstr( next_state ) )
 	end
 end
 
@@ -494,7 +500,7 @@ function Gesture:state_recognized( next_state, params )
 		self:do_state_possible( params )
 
 	else
-		print( "WARNING :: Gesture:state_recognized " .. tostring( next_state ) )
+		print( "WARNING :: Gesture:state_recognized " .. tstr( next_state ) )
 	end
 end
 
@@ -519,7 +525,7 @@ function Gesture:state_failed( next_state, params )
 	elseif next_state == Gesture.STATE_FAILED then
 		-- pass
 	else
-		print( "WARNING :: Gesture:state_failed " .. tostring( next_state ) )
+		print( "WARNING :: Gesture:state_failed " .. tstr( next_state ) )
 	end
 end
 

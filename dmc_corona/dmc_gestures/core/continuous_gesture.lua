@@ -65,6 +65,7 @@ local Gesture = require 'dmc_gestures.core.gesture'
 local newClass = Objects.newClass
 
 local tinsert = table.insert
+local tstr = tostring
 
 
 
@@ -295,7 +296,7 @@ function Continuous:state_possible( next_state, params )
 		self:do_state_possible( params )
 
 	else
-		print( "WARNING :: Continuous:state_possible " .. tostring( next_state ) )
+		print( "WARNING :: Continuous:state_possible " .. tstr( next_state ) )
 	end
 end
 
@@ -324,7 +325,7 @@ function Continuous:state_began( next_state, params )
 		self:do_state_recognized( params )
 
 	else
-		print( "WARNING :: Continuous:state_began " .. tostring( next_state ) )
+		print( "WARNING :: Continuous:state_began " .. tstr( next_state ) )
 	end
 end
 
@@ -354,7 +355,7 @@ function Continuous:state_changed( next_state, params )
 		self:do_state_recognized( params )
 
 	else
-		print( "WARNING :: Continuous:state_changed " .. tostring( next_state ) )
+		print( "WARNING :: Continuous:state_changed " .. tstr( next_state ) )
 	end
 end
 
@@ -392,7 +393,7 @@ function Continuous:state_cancelled( next_state, params )
 		self:do_state_possible( params )
 
 	else
-		print( "WARNING :: Continuous:state_cancelled " .. tostring( next_state ) )
+		print( "WARNING :: Continuous:state_cancelled " .. tstr( next_state ) )
 	end
 end
 
