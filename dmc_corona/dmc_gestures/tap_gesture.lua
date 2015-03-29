@@ -354,8 +354,9 @@ function TapGesture:touch( event )
 	local touch_count = self._touch_count
 
 	if phase=='began' then
-		self:_startFailTimer()
 		local r_touches = self._req_touches
+
+		self:_startFailTimer()
 		if touch_count==r_touches then
 			self:_startTapTimer()
 		elseif touch_count>r_touches then
