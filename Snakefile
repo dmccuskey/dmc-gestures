@@ -45,6 +45,10 @@ module_config = {
 				"requires": []
 			},
 			{
+				"exp_dir": "gesture-pan-move",
+				"requires": []
+			},
+			{
 				"exp_dir": "gesture-pinch-basic",
 				"requires": []
 			},
