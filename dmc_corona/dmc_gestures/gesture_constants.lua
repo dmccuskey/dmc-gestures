@@ -94,6 +94,17 @@ Constant.PAN_TOUCHES = 1
 
 
 --======================================================--
+-- Pinch Gesture
+
+Constant.TYPE_PINCH = 'pinch'
+
+--== Defaults
+
+Constant.PINCH_RESET_SCALE = true
+Constant.PINCH_THRESHOLD = 5
+
+
+--======================================================--
 -- Tap Gesture
 
 Constant.TYPE_TAP = 'tap'
