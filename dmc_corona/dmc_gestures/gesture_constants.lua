@@ -84,7 +84,15 @@ Constant.LONGPRESS_TAPS = 0
 Constant.LONGPRESS_TOUCHES = 1
 
 
+--======================================================--
+-- Pan Gesture
 
+Constant.TYPE_PAN = 'pan'
+
+--== Defaults
+
+Constant.PAN_THRESHOLD = 10
+Constant.PAN_TOUCHES = 1
 
 
 return Constant
