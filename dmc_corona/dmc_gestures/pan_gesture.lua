@@ -1,7 +1,7 @@
 --====================================================================--
 -- dmc_corona/dmc_gesture/pan_gesture.lua
 --
--- Documentation:
+-- Documentation: http://docs.davidmccuskey.com/dmc-gestures
 --====================================================================--
 
 --[[

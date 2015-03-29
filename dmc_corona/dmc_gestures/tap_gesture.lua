@@ -1,7 +1,7 @@
 --====================================================================--
 -- dmc_corona/dmc_gesture/tap_gesture.lua
 --
--- Documentation:
+-- Documentation: http://docs.davidmccuskey.com/dmc-gestures
 --====================================================================--
 
 --[[
