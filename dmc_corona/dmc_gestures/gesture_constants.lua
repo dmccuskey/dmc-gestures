@@ -58,8 +58,8 @@ local Constant = {}
 
 
 
---====================================================================--
---== Module
+--======================================================--
+-- Module
 
 
 -- maximum time to make a change after first press
@@ -69,10 +69,8 @@ Constant.FAIL_TIMEOUT = 300
 Constant.GESTURE_TIMEOUT = 300
 
 
-
---====================================================================--
---== Long Press Gesture
-
+--======================================================--
+-- Long Press Gesture
 
 Constant.TYPE_LONGPRESS = 'longpress'
 
