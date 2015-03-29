@@ -293,18 +293,6 @@ function PinchGesture:_do_reset()
 end
 
 
--- create data structure for Gesture which has been recognized
--- module will add phase=began/changed/ended
-function PinchGesture:_createGestureEvent( event )
-	return {
-		x=event.x,
-		y=event.y,
-		xStart=event.xStart,
-		yStart=event.yStart,
-	}
-end
-
-
 function PinchGesture:_stopFailTimer()
 	-- print( "PinchGesture:_stopFailTimer" )
 	if not self._fail_timer then return end
