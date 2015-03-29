@@ -1,7 +1,7 @@
 --====================================================================--
 -- dmc_corona/dmc_gesture/pan_gesture.lua
 --
--- Documentation:
+-- Documentation: http://docs.davidmccuskey.com/dmc-gestures
 --====================================================================--
 
 --[[
@@ -64,6 +64,7 @@ local Objects = require 'dmc_objects'
 local Utils = require 'dmc_utils'
 
 local Continuous = require 'dmc_gestures.core.continuous_gesture'
+local Constants = require 'dmc_gestures.gesture_constants'
 
 
 
@@ -74,6 +75,8 @@ local Continuous = require 'dmc_gestures.core.continuous_gesture'
 local newClass = Objects.newClass
 
 local mabs = math.abs
+local tcancel = timer.cancel
+local tdelay = timer.performWithDelay
 
 
 
@@ -91,9 +94,7 @@ local PanGesture = newClass( Continuous, { name="Pan Gesture" } )
 
 --== Class Constants
 
-PanGesture.TYPE = 'pan'
-
-PanGesture.MAX_DISTANCE_THRESHOLD = 10
+PanGesture.TYPE = Constants.TYPE_PAN
 
 
 --- Event name constant.
@@ -119,9 +120,9 @@ PanGesture.MAX_DISTANCE_THRESHOLD = 10
 function PanGesture:__init__( params )
 	-- print( "PanGesture:__init__", params )
 	params = params or {}
-	if params.touches==nil then params.touches=1 end
+	if params.threshold==nil then params.threshold=Constants.PAN_THRESHOLD end
+	if params.touches==nil then params.touches=Constants.PAN_TOUCHES end
 	if params.max_touches==nil then params.max_touches=params.touches end
-	if params.threshold==nil then params.threshold=PanGesture.MAX_DISTANCE_THRESHOLD end
 
 	self:superCall( '__init__', params )
 	--==--
@@ -129,13 +130,10 @@ function PanGesture:__init__( params )
 	--== Create Properties ==--
 
 	self._threshold = params.threshold
-
 	self._max_touches = params.max_touches
 	self._min_touches = params.touches
-	self._max_time = 500
 
 	self._velocity = 0
-	self._touch_count = 0
 
 end
 
@@ -144,8 +142,8 @@ function PanGesture:__initComplete__()
 	self:superCall( '__initComplete__' )
 	--==--
 	--== use setters
-	self.max_touches = self._max_touches
 	self.min_touches = self._min_touches
+	self.max_touches = self._max_touches
 	self.threshold = self._threshold
 end
 
@@ -159,7 +157,6 @@ end
 
 -- END: Setup DMC Objects
 --======================================================--
-
 
 
 
@@ -204,17 +201,6 @@ function PanGesture.__gs_delegate() end
 --======================================================--
 
 
-
---- the velocity of the pan gesture motion (number).
--- Get Only
--- @function .velocity
--- @usage print( pan.velocity )
---
-function PanGesture.__getters:velocity()
-	return self._velocity
-end
-
-
 --- the distance a touch must move to count as the start of a pan (number).
 --
 -- @function .threshold
@@ -225,7 +211,7 @@ function PanGesture.__getters:threshold()
 	return self._threshold
 end
 function PanGesture.__setters:threshold( value )
-	assert( type(value)=='number' and value>0 and value<256 )
+	assert( type(value)=='number' and value>=0 and value<256 )
 	--==--
 	self._threshold = value
 end
@@ -263,6 +249,15 @@ function PanGesture.__setters:max_touches( value )
 end
 
 
+--- the velocity of the pan gesture motion (number).
+-- Get Only
+-- @function .velocity
+-- @usage print( pan.velocity )
+--
+function PanGesture.__getters:velocity()
+	return self._velocity
+end
+
 
 
 --====================================================================--
@@ -273,71 +268,6 @@ function PanGesture:_do_reset()
 	-- print( "PanGesture:_do_reset" )
 	Continuous._do_reset( self )
 	self._velocity=0
-	self._touch_count=0
-end
-
-
--- create data structure for Gesture which has been recognized
--- code will put in began/changed/ended
-function PanGesture:_createGestureEvent( event )
-	local evt = {
-		x=x
-	}
-	return {
-		x=event.x,
-		y=event.y,
-		xStart=event.xStart,
-		yStart=event.yStart,
-	}
-end
-
-
-function PanGesture:_stopFailTimer()
-	-- print( "PanGesture:_stopFailTimer" )
-	if not self._fail_timer then return end
-	timer.cancel( self._fail_timer )
-	self._fail_timer=nil
-end
-
-function PanGesture:_startFailTimer()
-	-- print( "PanGesture:_startFailTimer", self )
-	self:_stopFailTimer()
-	local time = self._max_time
-	local func = function()
-		timer.performWithDelay( 1, function()
-			self:gotoState( PanGesture.STATE_FAILED )
-			self._fail_timer = nil
-		end)
-	end
-	self._fail_timer = timer.performWithDelay( time, func )
-end
-
-
-function PanGesture:_stopPanTimer()
-	-- print( "PanGesture:_stopPanTimer" )
-	if not self._pan_timer then return end
-	timer.cancel( self._pan_timer )
-	self._pan_timer=nil
-end
-
-function PanGesture:_startPanTimer()
-	-- print( "PanGesture:_startPanTimer", self )
-	self:_stopFailTimer()
-	self:_stopPanTimer()
-	local time = self._max_time
-	local func = function()
-		timer.performWithDelay( 1, function()
-			self:gotoState( PanGesture.STATE_FAILED )
-			self._pan_timer = nil
-		end)
-	end
-	self._pan_timer = timer.performWithDelay( time, func )
-end
-
-
-function PanGesture:_stopAllTimers()
-	self:_stopFailTimer()
-	self:_stopPanTimer()
 end
 
 
@@ -352,44 +282,48 @@ function PanGesture:touch( event )
 	-- print("PanGesture:touch", event.phase, event.id, self )
 	Continuous.touch( self, event )
 
-	local _mabs = mabs
 	local phase = event.phase
-	local threshold = self._threshold
 	local state = self:getState()
 	local t_max = self._max_touches
 	local t_min = self._min_touches
 	local touch_count = self._touch_count
-	local data
 
 	local is_touch_ok = ( touch_count>=t_min and touch_count<=t_max )
 
 	if phase=='began' then
+		local threshold = self._threshold
+
 		self:_startFailTimer()
+		self._gesture_attempt=true
+
 		if is_touch_ok then
-			self:_startPanTimer()
+			self:_addMultitouchToQueue( Continuous.BEGAN )
+			self:_startGestureTimer()
+
+			if threshold==0 then
+				self:gotoState( Continuous.STATE_BEGAN, event )
+			end
 		elseif touch_count>t_max then
 			self:gotoState( PanGesture.STATE_FAILED )
 		end
 
 	elseif phase=='moved' then
+		local _mabs = mabs
+		local threshold = self._threshold
 
 		if state==Continuous.STATE_POSSIBLE then
+			self:_addMultitouchToQueue( Continuous.CHANGED )
 			if is_touch_ok and (_mabs(event.xStart-event.x)>threshold or _mabs(event.yStart-event.y)>threshold) then
-				-- self:_stopPanTimer()
 				self:gotoState( Continuous.STATE_BEGAN, event )
 			end
-		elseif state==Continuous.STATE_BEGAN then
+
+		elseif state==Continuous.STATE_BEGAN or state==Continuous.STATE_CHANGED then
 			if is_touch_ok then
 				self:gotoState( Continuous.STATE_CHANGED, event )
 			else
 				self:gotoState( Continuous.STATE_RECOGNIZED, event )
 			end
-		elseif state==Continuous.STATE_CHANGED then
-			if is_touch_ok then
-				self:gotoState( Continuous.STATE_CHANGED, event )
-			else
-				self:gotoState( Continuous.STATE_RECOGNIZED, event )
-			end
+
 		end
 
 	elseif phase=='cancelled' then
@@ -416,23 +350,7 @@ end
 --== State Machine
 
 
---== State Recognized ==--
-
-function PanGesture:do_state_began( params )
-	-- print( "PanGesture:do_state_began" )
-	self:_stopAllTimers()
-	Continuous.do_state_began( self, params )
-end
-
-
---== State Failed ==--
-
-function PanGesture:do_state_failed( params )
-	-- print( "PanGesture:do_state_failed" )
-	self:_stopAllTimers()
-	Continuous.do_state_failed( self, params )
-end
-
+-- none
 
 
 

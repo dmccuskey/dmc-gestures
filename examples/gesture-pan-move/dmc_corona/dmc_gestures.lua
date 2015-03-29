@@ -172,6 +172,48 @@ end
 
 
 --======================================================--
+-- newLongPressGesture Support
+
+function Gesture._loadLongPressGestureSupport( params )
+	-- print( "Gesture._loadLongPressGestureSupport" )
+	if Gesture.LongPress then return end
+	--==--
+	local LongPress = require 'dmc_gestures.longpress_gesture'
+	Gesture.LongPress=LongPress
+end
+
+---
+
+--- Optional parameters for newLongPressGesture()
+-- @string id a name for the gesture, available in events
+-- @object delegate a delegate object to control this gesture
+-- @int touches minimum number of taps, default 1
+-- @int max_touches maximum number of taps, default 1
+-- @int threshold movement required to recognize the tap, default 10
+-- @table newLongPressParams
+
+
+--- Create a Long Press Gesture Recognizer.
+-- creates recognizers which watch for drag/pan gestures
+--
+-- @object view Corona Display object
+-- @tparam[opt] table params @{newLongPressParams}
+-- @treturn LongPress a long-press gesture object
+-- @usage local g = Gesture.newLongPressGesture( view )
+--
+function Gesture.newLongPressGesture( view, params )
+	-- print( "Gesture.newLongPressGesture", view )
+	params = params or {}
+	params.view = view
+	--==--
+	if not Gesture.LongPress then Gesture._loadLongPressGestureSupport() end
+	local o = Gesture.LongPress:new( params )
+	Gesture._addGestureToManager( o )
+	return o
+end
+
+
+--======================================================--
 -- newPanGesture Support
 
 function Gesture._loadPanGestureSupport( params )
@@ -185,11 +227,11 @@ end
 ---
 
 --- Optional parameters for newPanGesture()
--- @field id a name for the gesture, available in events
--- @field delegate a delegate object to control this gesture
--- @field touches minimum number of taps, default 1
--- @field max_touches maximum number of taps, default 1
--- @field threshold movement required to cancel the tap, default 10
+-- @string id a name for the gesture, available in events
+-- @object delegate a delegate object to control this gesture
+-- @int touches minimum number of taps, default 1
+-- @int max_touches maximum number of taps, default 1
+-- @int threshold movement required to recognize the tap, default 10
 -- @table newPanParams
 
 
@@ -214,6 +256,47 @@ end
 
 
 --======================================================--
+-- newPinchGesture Support
+
+function Gesture._loadPinchGestureSupport( params )
+	-- print( "Gesture._loadPinchGestureSupport" )
+	if Gesture.Pinch then return end
+	--==--
+	local newPinchGesture = require 'dmc_gestures.pinch_gesture'
+	Gesture.Pinch=newPinchGesture
+end
+
+
+--- Optional parameters for newPinchGesture()
+-- @string id a name for the gesture, available in events
+-- @object delegate a delegate object to control this gesture
+-- @bool reset_scale reset scale to 1.0 after pinch, default true
+-- @int threshold touch movement required to recognize the gesture, default 5
+-- @int time_limit max time allowed to recognize the gesture, default 500ms
+-- @table newPinchParams
+
+
+--- Create a Pinch Gesture Recognizer.
+-- creates recognizers which watch for pinch gestures, eg for zoom
+--
+-- @object view Corona Display object
+-- @tparam[opt] table params @{newPinchParams}
+-- @treturn PinchGesture a pan gesture object
+-- @usage local g = Gesture.newPinchGesture( view )
+--
+function Gesture.newPinchGesture( view, params )
+	-- print( "Gesture.newPinchGesture", view )
+	params = params or {}
+	params.view = view
+	--==--
+	if not Gesture.Pinch then Gesture._loadPinchGestureSupport() end
+	local o = Gesture.Pinch:new( params )
+	Gesture._addGestureToManager( o )
+	return o
+end
+
+
+--======================================================--
 -- newTapGesture Support
 
 function Gesture._loadTapGestureSupport( params )
@@ -225,12 +308,12 @@ function Gesture._loadTapGestureSupport( params )
 end
 
 --- Optional parameters for newTapGesture()
--- @field id a name for the gesture, available in events
--- @field delegate a delegate object to control this gesture
--- @field accuracy the maximum movement allowed between taps, default 10
--- @field taps the minimum number of taps required, default 1
--- @field time maximum time between taps, default 300 ms
--- @field touches minimum number of touches required, default 1
+-- @string id a name for the gesture, available in events
+-- @object delegate a delegate object to control this gesture
+-- @int accuracy the maximum movement allowed between taps, default 10
+-- @int taps the minimum number of taps required, default 1
+-- @int time maximum time between taps, default 300 ms
+-- @int touches minimum number of touches required, default 1
 -- @table newTapParams
 
 --- Create a Tap Gesture Recognizer.

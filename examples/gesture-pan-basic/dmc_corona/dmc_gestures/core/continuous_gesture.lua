@@ -64,6 +64,9 @@ local Gesture = require 'dmc_gestures.core.gesture'
 
 local newClass = Objects.newClass
 
+local tinsert = table.insert
+local tstr = tostring
+
 
 
 --====================================================================--
@@ -157,14 +160,22 @@ function Continuous:_calculateCentroid( touches )
 end
 
 
+--======================================================--
+-- Multitouch Event
+
 -- this one goes to the Gesture consumer (who created gesture)
-function Continuous:_startMultitouchEvent()
-	-- print("Continuous:_startMultitouchEvent" )
+function Continuous:_createMultitouchEvent( params )
+	params = params or {}
+	if params.phase==nil then params.phase=Continuous.BEGAN end
+	if params.time==nil then params.time=system.getTimer() end
+	--==--
+	-- print("Continuous:_createMultitouchEvent" )
 	local pos = self:_calculateCentroid( self._touches )
 	local me = {
 		id=self._id,
 		gesture=self.TYPE,
-		phase=Continuous.BEGAN,
+		phase=params.phase,
+		time=params.time,
 		xStart=pos.x,
 		yStart=pos.y,
 		x=pos.x,
@@ -172,54 +183,78 @@ function Continuous:_startMultitouchEvent()
 		count=self._touch_count,
 		touches=self._touches
 	}
-	self._multitouch_evt = me
 	return me
 end
 
-function Continuous:_updateMultitouchEvent()
-	-- print("Continuous:_updateMultitouchEvent" )
+function Continuous:_updateMultitouchEvent( me, params )
+	-- print("Continuous:_updateMultitouchEvent", me, params )
+	params = params or {}
+	if params.phase==nil then params.phase=Continuous.CHANGED end
+	if params.time==nil then params.time=system.getTimer() end
+	--==--
 	local pos = self:_calculateCentroid( self._touches )
-	local me = self._multitouch_evt
 
-	me.phase = Continuous.CHANGED
+	me.phase = params.phase
 	me.x, me.y = pos.x, pos.y
 	me.count=self._touch_count
+	me.time=params.time
 
 	return me
 end
 
-function Continuous:_endMultitouchEvent()
+function Continuous:_endMultitouchEvent( me, params )
 	-- print("Continuous:_endMultitouchEvent" )
+	params = params or {}
+	if params.phase==nil then params.phase=Continuous.ENDED end
+	if params.time==nil then params.time=system.getTimer() end
+	--==--
 	local pos = self:_calculateCentroid( self._touches )
-	local me = self._multitouch_evt
 
-	me.phase = Continuous.ENDED
+	me.phase = params.phase
 	me.x, me.y = pos.x, pos.y
 	me.count=self._touch_count
+	me.time=params.time
 
-	self._multitouch_evt = nil
 	return me
 end
 
+
+function Continuous:_addMultitouchToQueue( phase )
+	-- print("Continuous:_addMultitouchToQueue", phase )
+	local me = self:_createMultitouchEvent({phase=phase})
+	self._multitouch_evt = me
+	tinsert( self._multitouch_queue, me )
+end
+
+
+--======================================================--
+-- Event Dispatch
 
 -- this one goes to the Gesture consumer (who created gesture)
+-- actually, dispatch entire Multitouch Queue
+--
 function Continuous:_dispatchBeganEvent()
 	-- print("Continuous:_dispatchBeganEvent" )
-	local me = self:_startMultitouchEvent()
-	self:dispatchEvent( self.GESTURE, me, {merge=true} )
+	local queue = self._multitouch_queue
+	for i=1,#queue do
+		local me = queue[i]
+		self:dispatchEvent( self.GESTURE, me, {merge=true} )
+	end
 end
 
 -- this one goes to the Gesture consumer (who created gesture)
 function Continuous:_dispatchChangedEvent()
 	-- print("Continuous:_dispatchChangedEvent" )
-	local me = self:_updateMultitouchEvent()
+	local me = self._multitouch_evt
+	self:_updateMultitouchEvent( me )
 	self:dispatchEvent( self.GESTURE, me, {merge=true} )
 end
 
 -- this one goes to the Gesture consumer (who created gesture)
 function Continuous:_dispatchRecognizedEvent()
 	-- print("Continuous:_dispatchRecognizedEvent" )
-	local me = self:_endMultitouchEvent()
+	local me = self._multitouch_evt
+	self:_endMultitouchEvent( me )
 	self:dispatchEvent( self.GESTURE, me, {merge=true} )
 end
 
@@ -261,7 +296,7 @@ function Continuous:state_possible( next_state, params )
 		self:do_state_possible( params )
 
 	else
-		print( "WARNING :: Continuous:state_possible " .. tostring( next_state ) )
+		print( "WARNING :: Continuous:state_possible " .. tstr( next_state ) )
 	end
 end
 
@@ -273,6 +308,7 @@ function Continuous:do_state_began( params )
 	params = params or {}
 	if params.notify==nil then params.notify=true end
 	--==--
+	self:_stopAllTimers()
 	self:setState( Continuous.STATE_BEGAN )
 	self:_dispatchGestureNotification( params.notify )
 	self:_dispatchStateNotification( params.notify )
@@ -289,7 +325,7 @@ function Continuous:state_began( next_state, params )
 		self:do_state_recognized( params )
 
 	else
-		print( "WARNING :: Continuous:state_began " .. tostring( next_state ) )
+		print( "WARNING :: Continuous:state_began " .. tstr( next_state ) )
 	end
 end
 
@@ -302,7 +338,6 @@ function Continuous:do_state_changed( params )
 	if params.notify==nil then params.notify=true end
 	--==--
 	self:setState( Continuous.STATE_CHANGED )
-	self:_updateMultitouchEvent()
 	self:_dispatchStateNotification( params.notify )
 	self:_dispatchChangedEvent()
 end
@@ -320,7 +355,7 @@ function Continuous:state_changed( next_state, params )
 		self:do_state_recognized( params )
 
 	else
-		print( "WARNING :: Continuous:state_changed " .. tostring( next_state ) )
+		print( "WARNING :: Continuous:state_changed " .. tstr( next_state ) )
 	end
 end
 
@@ -345,6 +380,7 @@ function Continuous:do_state_cancelled( params )
 	params = params or {}
 	if params.notify==nil then params.notify=true end
 	--==--
+	self:_stopAllTimers()
 	self:setState( Continuous.STATE_CANCELED )
 	self:_endMultitouchEvent()
 	self:_dispatchStateNotification( params.notify )
@@ -357,7 +393,7 @@ function Continuous:state_cancelled( next_state, params )
 		self:do_state_possible( params )
 
 	else
-		print( "WARNING :: Continuous:state_cancelled " .. tostring( next_state ) )
+		print( "WARNING :: Continuous:state_cancelled " .. tstr( next_state ) )
 	end
 end
 

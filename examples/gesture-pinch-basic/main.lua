@@ -29,10 +29,9 @@ local W, H = display.contentWidth, display.contentHeight
 local H_CENTER, V_CENTER = W*0.5, H*0.5
 
 
-local txt_display, txt_display_t
-local timer_t
-local circle, view
-local xScale, yScale
+local txt_display, txt_display_t, timer_t
+local circle, showCircle = nil, true
+local view, xScale, yScale
 
 
 
@@ -69,31 +68,6 @@ local function setupUI()
 end
 
 
-local function gestureEvent_handler( event )
-	-- print( "gestureEvent_handler", event.phase )
-	if event.type == event.target.GESTURE then
-		local eS = event.scale
-
-		if event.phase=='began' then
-			-- store current scale for this gesture event
-			xScale, yScale = view.xScale, view.yScale
-			view.xScale, view.yScale = xScale*eS, yScale*eS
-
-			-- circle = display.newCircle( event.x, event.y, 10 )
-
-		elseif event.phase=='changed' then
-			view.xScale, view.yScale = xScale*eS, yScale*eS
-			-- circle.x, circle.y = event.x, event.y
-
-		else
-			view.xScale, view.yScale = xScale*eS, yScale*eS
-			-- if circle then circle:removeSelf() ; circle=nil end
-		end
-		displayFeedback( "Gesture: "..tostring(event.id)..tostring(event.scale) )
-	end
-end
-
-
 
 --====================================================================--
 --== Main
@@ -103,6 +77,41 @@ end
 local function main()
 
 	local pinch
+
+
+	local function gestureEvent_handler( event )
+		-- print( "gestureEvent_handler", event.phase )
+		if event.type == event.target.GESTURE then
+			local eS = event.scale
+
+			if event.phase=='began' then
+				-- store current scale for this gesture event
+				xScale, yScale = view.xScale, view.yScale
+				view.xScale, view.yScale = xScale*eS, yScale*eS
+
+				if showCircle then
+					circle = display.newCircle( event.x, event.y, 10 )
+				end
+
+			elseif event.phase=='changed' then
+				view.xScale, view.yScale = xScale*eS, yScale*eS
+
+				if showCircle then
+					circle.x, circle.y = event.x, event.y
+				end
+
+			else
+				view.xScale, view.yScale = xScale*eS, yScale*eS
+
+				if showCircle then
+					if circle then circle:removeSelf() ; circle=nil end
+				end
+
+			end
+			displayFeedback( "Gesture: "..tostring(event.id)..tostring(event.scale) )
+		end
+	end
+
 
 	-- create touch area for gestures
 

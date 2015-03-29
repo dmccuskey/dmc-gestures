@@ -102,7 +102,7 @@ local function main()
 
 	-- create a gesture, link to touch area
 
-	tap = Gesture.newLongPressGesture( view, { id="1 tch 0 tap", taps=1 }  )
+	tap = Gesture.newLongPressGesture( view, { id="1 tch 0 tap", taps=0 }  )
 	tap:addEventListener( tap.EVENT, gestureEvent_handler )
 
 	tap = Gesture.newLongPressGesture( view, { touches=2, taps=1, id="2 tch 1 tap" } )
