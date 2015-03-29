@@ -307,6 +307,7 @@ function Continuous:do_state_began( params )
 	params = params or {}
 	if params.notify==nil then params.notify=true end
 	--==--
+	self:_stopAllTimers()
 	self:setState( Continuous.STATE_BEGAN )
 	self:_dispatchGestureNotification( params.notify )
 	self:_dispatchStateNotification( params.notify )
@@ -378,6 +379,7 @@ function Continuous:do_state_cancelled( params )
 	params = params or {}
 	if params.notify==nil then params.notify=true end
 	--==--
+	self:_stopAllTimers()
 	self:setState( Continuous.STATE_CANCELED )
 	self:_endMultitouchEvent()
 	self:_dispatchStateNotification( params.notify )

@@ -15,6 +15,7 @@ module_config = {
 			"dmc_gestures/core/gesture.lua",
 			"dmc_gestures/core/continuous_gesture.lua",
 			"dmc_gestures/gesture_manager.lua",
+			"dmc_gestures/longpress_gesture.lua",
 			"dmc_gestures/pan_gesture.lua",
 			"dmc_gestures/pinch_gesture.lua",
 			#"dmc_gestures/swipe_gesture.lua",
@@ -31,6 +32,10 @@ module_config = {
 	"examples": {
 		"base_dir": "examples",
 		"apps": [
+			{
+				"exp_dir": "gesture-longpress-basic",
+				"requires": []
+			},
 			{
 				"exp_dir": "gesture-multigesture-basic",
 				"requires": []
