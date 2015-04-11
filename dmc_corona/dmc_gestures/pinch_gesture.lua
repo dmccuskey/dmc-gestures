@@ -179,9 +179,6 @@ end
 -- @section getters-setters
 
 
---======================================================--
--- START: bogus methods, copied from super class
-
 --- the gesture's id (string).
 -- this is useful to differentiate between
 -- different gestures attached to the same view object
@@ -189,27 +186,18 @@ end
 -- @function .id
 -- @usage print( gesture.id )
 -- @usage gesture.id = "myid"
---
-function PinchGesture.__gs_id() end
 
 --- the gesture's target view (Display Object).
 --
 -- @function .view
 -- @usage print( gesture.view )
 -- @usage gesture.view = DisplayObject
---
-function PinchGesture.__gs_view() end
 
 --- the gesture's delegate (object/table)
 --
 -- @function .delegate
 -- @usage print( gesture.delegate )
 -- @usage gesture.delegate = DisplayObject
---
-function PinchGesture.__gs_delegate() end
-
--- END: bogus methods, copied from super class
---======================================================--
 
 
 
