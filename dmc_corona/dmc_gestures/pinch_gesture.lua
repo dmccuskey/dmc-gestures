@@ -332,6 +332,7 @@ function PinchGesture:_endMultitouchEvent( me, params )
 	local o_dist = self._touch_dist
 	local n_dist = self:_calculateTouchDistance( self._touches )
 	me.scale = (1-(o_dist-n_dist)/o_dist)*self._prev_scale
+	self._prev_scale = me.scale
 	return me
 end
 
