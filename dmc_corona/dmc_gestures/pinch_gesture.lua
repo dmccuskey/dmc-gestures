@@ -143,7 +143,7 @@ function PinchGesture:__init__( params )
 	self._min_touches = 2
 	self._touch_dist = 0
 
-	self._test_mode = true
+	self._test_mode = false
 	self._test_evt = nil
 
 end
