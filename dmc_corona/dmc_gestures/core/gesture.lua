@@ -120,24 +120,32 @@ function Gesture:__init__( params )
 
 	assert( params.view )
 
+	-- save params for later
+	self._gr_params = params
+
 	--== Create Properties ==--
 
-	self._id = params.id
-
+	self._delegate = nil
+	self._id = nil
 	self._view = params.view
 
-	self._delegate = params.delegate
+	-- internal properties
+
+	self._fail_timer=nil
+
+	self._gesture_attempt=false
+	self._gesture_timer=nil
+
+	self._multitouch_evt = nil
+	self._multitouch_queue = {}
 
 	self._touch_count = 0
 	self._total_touch_count = 0
 	self._touches = {} -- keyed on ID
-	self._multitouch_evt = nil
-	self._multitouch_queue = {}
-	self._gesture_attempt=false
-	self._gesture_timer=nil
-	self._fail_timer=nil
 
-	self._gesture_mgr = params.gesture_mgr
+	--== Objects ==--
+
+	self._gesture_mgr = nil
 
 	self:setState( Gesture.STATE_CREATE )
 end
@@ -153,6 +161,16 @@ function Gesture:__initComplete__()
 	-- print( "Gesture:__initComplete__" )
 	self:superCall( ObjectBase, '__initComplete__' )
 	--==--
+
+	local tmp = self._gr_params
+
+	--== Use Setters
+	self.id = tmp.id
+	self.delegate = tmp.delegate
+	self.gesture_mgr = tmp.gesture_mgr
+
+	self._gr_params = nil
+
 	self:gotoState( Gesture.STATE_POSSIBLE )
 end
 
