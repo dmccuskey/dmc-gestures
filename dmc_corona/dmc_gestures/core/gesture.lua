@@ -254,16 +254,20 @@ function Gesture:shouldReceiveTouch()
 	local f = del and del.shouldReceiveTouch
 	local shouldReceiveTouch = true
 	if f then shouldReceiveTouch = f( self ) end
+	assert( type(shouldReceiveTouch)=='boolean', "ERROR: Delegate shouldReceiveTouch, expected return type boolean")
 	return shouldReceiveTouch
 end
 
 
+-- gesture is one which is Recognizing
+--
 function Gesture:forceToFail( gesture )
 	-- print( "Gesture:forceToFail", gesture )
 	local del = self._delegate
-	local f = del and del.shouldRecognizeSimultaneously
+	local f = del and del.shouldRecognizeWith
 	local shouldResume = false
-	if f then shouldResume = f( self, gesture ) end
+	if f then shouldResume = f( del, gesture, self ) end
+	assert( type(shouldResume)=='boolean', "ERROR: Delegate shouldRecognizeWith, expected return type boolean")
 	if not shouldResume then
 		self:gotoState( Gesture.STATE_FAILED, {notify=false} )
 	end
