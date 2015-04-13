@@ -328,7 +328,8 @@ function Continuous:state_began( next_state, params )
 		self:do_state_cancelled( params )
 
 	elseif next_state == Continuous.STATE_FAILED then
-		self:do_state_failed( params )
+		-- either cancelled or recognized
+		self:do_state_cancelled( params )
 
 	else
 		print( "WARNING :: Continuous:state_began " .. tstr( next_state ) )
@@ -359,6 +360,10 @@ function Continuous:state_changed( next_state, params )
 
 	elseif next_state == Continuous.STATE_RECOGNIZED then
 		self:do_state_recognized( params )
+
+	elseif next_state == Continuous.STATE_FAILED then
+		-- either cancelled or recognized
+		self:do_state_cancelled( params )
 
 	else
 		print( "WARNING :: Continuous:state_changed " .. tstr( next_state ) )
