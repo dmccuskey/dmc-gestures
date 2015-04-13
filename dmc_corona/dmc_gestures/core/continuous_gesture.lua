@@ -144,6 +144,18 @@ end
 --== Private Methods
 
 
+--======================================================--
+-- Multitouch Event
+
+
+function Continuous:_addMultitouchToQueue( phase )
+	-- print("Continuous:_addMultitouchToQueue", phase )
+	local me = self:_createMultitouchEvent({phase=phase})
+	self._multitouch_evt = me
+	tinsert( self._multitouch_queue, me )
+end
+
+
 --- calculate the "middle" of touch points in this gesture
 -- @param table of touches
 -- @return Coordinate table of coordinates
@@ -160,16 +172,13 @@ function Continuous:_calculateCentroid( touches )
 end
 
 
---======================================================--
--- Multitouch Event
-
 -- this one goes to the Gesture consumer (who created gesture)
 function Continuous:_createMultitouchEvent( params )
+	-- print("Continuous:_createMultitouchEvent" )
 	params = params or {}
 	if params.phase==nil then params.phase=Continuous.BEGAN end
 	if params.time==nil then params.time=system.getTimer() end
 	--==--
-	-- print("Continuous:_createMultitouchEvent" )
 	local pos = self:_calculateCentroid( self._touches )
 	local me = {
 		id=self._id,
@@ -216,14 +225,6 @@ function Continuous:_endMultitouchEvent( me, params )
 	me.time=params.time
 
 	return me
-end
-
-
-function Continuous:_addMultitouchToQueue( phase )
-	-- print("Continuous:_addMultitouchToQueue", phase )
-	local me = self:_createMultitouchEvent({phase=phase})
-	self._multitouch_evt = me
-	tinsert( self._multitouch_queue, me )
 end
 
 
