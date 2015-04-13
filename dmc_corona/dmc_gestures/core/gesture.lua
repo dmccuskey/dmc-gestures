@@ -224,9 +224,9 @@ end
 function Gesture.__getters:view()
 	return self._view
 end
-function Gesture.__setters:view( value )
-	self._view = value
-end
+-- function Gesture.__setters:view( value )
+-- 	self._view = value
+-- end
 
 
 function Gesture:cancelsTouchesInView()
