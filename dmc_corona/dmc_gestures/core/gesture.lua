@@ -229,19 +229,23 @@ end
 -- end
 
 
+-- @TODO
 function Gesture:cancelsTouchesInView()
 	-- print( "Gesture:cancelsTouchesInView" )
 end
 
+-- @TODO
 function Gesture:delaysTouchesBegan()
 	-- print( "Gesture:delaysTouchesBegan" )
 end
 
 
+-- @TODO
 function Gesture:delaysTouchesEnded()
 	-- print( "Gesture:delaysTouchesEnded" )
 end
 
+-- @TODO
 function Gesture:requiresGestureRecognizerToFail()
 	-- print( "Gesture:requiresGestureRecognizerToFail" )
 end
