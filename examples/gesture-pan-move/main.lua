@@ -100,8 +100,8 @@ local function main()
 	pan = Gesture.newPanGesture( view, { touches=1, id="1 pan" } )
 	pan:addEventListener( pan.EVENT, gestureEvent_handler )
 
-	-- pan = Gesture.newPanGesture( view, { touches=2, id="2 pan" } )
-	-- pan:addEventListener( pan.EVENT, gestureEvent_handler )
+	pan = Gesture.newPanGesture( view, { touches=2, id="2 pan" } )
+	pan:addEventListener( pan.EVENT, gestureEvent_handler )
 
 
 end
