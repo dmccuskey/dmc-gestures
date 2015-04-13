@@ -190,6 +190,28 @@ end
 --====================================================================--
 --== Public Methods
 
+--======================================================--
+-- Getters/Setters
+
+
+function Gesture.__getters:id()
+	return self._id
+end
+function Gesture.__setters:id( value )
+	assert( value==nil or type(value)=='string' )
+	self._id = value
+end
+
+-- delegate
+
+function Gesture.__getters:delegate()
+	return self._delegate
+end
+function Gesture.__setters:delegate( value )
+	assert( value==nil or type(value)=='table' )
+	self._delegate = value
+end
+
 
 function Gesture.__getters:gesture_mgr()
 	return self._gesture_mgr
