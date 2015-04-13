@@ -42,6 +42,10 @@ module_config = {
 				"requires": []
 			},
 			{
+				"exp_dir": "gesture-multigesture-simultaneous",
+				"requires": []
+			},
+			{
 				"exp_dir": "gesture-pan-basic",
 				"requires": []
 			},
