@@ -82,7 +82,7 @@ local function main()
 	local view, tap
 
 	local function gestureEvent_handler( event )
-		-- print( "gestureEvent_handler" )
+		-- print( "gestureEvent_handler", event.phase )
 		if event.type == event.target.GESTURE then
 			if event.phase=='began' then
 				circle = display.newCircle( event.x, event.y, 10 )
