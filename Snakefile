@@ -20,6 +20,7 @@ module_config = {
 			"dmc_gestures/longpress_gesture.lua",
 			"dmc_gestures/pan_gesture.lua",
 			"dmc_gestures/pinch_gesture.lua",
+			#"dmc_gestures/rotation_gesture.lua",
 			#"dmc_gestures/swipe_gesture.lua",
 			"dmc_gestures/tap_gesture.lua",
 		],
