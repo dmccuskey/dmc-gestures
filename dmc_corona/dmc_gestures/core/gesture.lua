@@ -54,8 +54,9 @@ local VERSION = "0.1.0"
 
 
 local Objects = require 'dmc_objects'
-local StatesMixModule = require 'dmc_states_mix'
+local Patch = require 'dmc_patch'
 
+local StatesMixModule = require 'dmc_states_mix'
 local Constants = require 'dmc_gestures.gesture_constants'
 
 
@@ -64,11 +65,14 @@ local Constants = require 'dmc_gestures.gesture_constants'
 --== Setup, Constants
 
 
+Patch.addPatch( 'print-output' )
+
 local newClass = Objects.newClass
 local ObjectBase = Objects.ObjectBase
 
 local StatesMix = StatesMixModule.StatesMix
 
+local sfmt = string.format
 local tcancel = timer.cancel
 local tdelay = timer.performWithDelay
 local tstr = tostring
