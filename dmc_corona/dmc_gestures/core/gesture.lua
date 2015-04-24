@@ -503,7 +503,7 @@ function Gesture:do_state_possible( params )
 end
 
 function Gesture:state_possible( next_state, params )
-	print( "Gesture:state_possible: >> ", next_state )
+	-- print( "Gesture:state_possible: >> ", next_state )
 
 	--== Check Delegate to see if this transition is OK
 
