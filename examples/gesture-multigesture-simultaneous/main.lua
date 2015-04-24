@@ -153,7 +153,7 @@ end
 
 local function example_2()
 
-	local view, pan, pinch
+	local view, pan, pinch, tap
 	local delegate
 
 	setupUI()
@@ -184,6 +184,8 @@ local function example_2()
 	view:setFillColor( 0.3,0.3,0.3 )
 
 	-- create some gestures, link to touch area
+	-- emulating scrollview/photo requirements:
+	-- 1 touch pan, 2 touch double tap, 1 touch double tap, pinch
 
 	-- pan gesture, 1 touch
 
@@ -191,15 +193,22 @@ local function example_2()
 	pan.delegate=delegate
 	pan:addEventListener( pan.EVENT, gestureEvent_handler )
 
-	-- pan gesture, 2 touch
+	-- tap gesture, 1 touch, double tap, 2 touch
 
-	pan = Gesture.newPanGesture( view, { touches=2, id='2 pan' } )
-	pan.delegate=delegate
-	pan:addEventListener( pan.EVENT, gestureEvent_handler )
+	tap = Gesture.newTapGesture( view, { touches=1, taps=2, id='1 tch 2 tap' } )
+	tap.delegate=delegate
+	tap:addEventListener( tap.EVENT, gestureEvent_handler )
+
+	-- tap gesture, 2 touch, double tap, 2 touch
+
+	tap = Gesture.newTapGesture( view, { touches=2, taps=2, id='2 tch 2 tap' } )
+	tap.delegate=delegate
+	tap:addEventListener( tap.EVENT, gestureEvent_handler )
 
 	-- pinch gesture, 2 touch
 
-	pinch = Gesture.newPinchGesture( view, { id='pinch', delegate=delegate } )
+	pinch = Gesture.newPinchGesture( view, { id='pinch' } )
+	pinch.delegate=delegate
 	pinch:addEventListener( pinch.EVENT, gestureEvent_handler )
 
 end
