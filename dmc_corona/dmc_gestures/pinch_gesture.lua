@@ -347,6 +347,7 @@ end
 --======================================================--
 --== Test Methods
 
+--[[
 function PinchGesture:_startTestTouchEvent( event )
 	-- print("PinchGesture:_startTestTouchEvent")
 	local offset = 30
@@ -376,6 +377,7 @@ function PinchGesture:_endTestTouchEvent( event )
 		self:touch( evt )
 	end)
 end
+--]]
 
 
 
