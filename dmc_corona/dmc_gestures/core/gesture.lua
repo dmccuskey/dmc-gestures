@@ -499,8 +499,6 @@ end
 
 function Gesture:do_state_possible( params )
 	-- print( "Gesture:do_state_possible" )
-	params = params or {}
-	--==--
 	self:setState( Gesture.STATE_POSSIBLE )
 end
 
