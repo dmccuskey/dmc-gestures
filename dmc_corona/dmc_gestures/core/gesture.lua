@@ -314,10 +314,10 @@ end
 -- Event Dispatch
 
 -- this one goes to the Gesture Manager
-function Gesture:_dispatchGestureNotification( notify )
+function Gesture:_dispatchGestureNotification( params )
 	-- print("Gesture:_dispatchGestureNotification", notify )
 	local g_mgr = self._gesture_mgr
-	if g_mgr and notify then
+	if g_mgr and params.notify then
 		g_mgr:gesture{
 			target=self,
 			id=self._id,
@@ -329,15 +329,18 @@ end
 
 
 -- this one goes to the Gesture Manager
-function Gesture:_dispatchStateNotification( notify )
+function Gesture:_dispatchStateNotification( params )
 	-- print("Gesture:_dispatchStateNotification" )
+	params = params or {}
+	local state = params.state or self:getState()
+	--==--
 	local g_mgr = self._gesture_mgr
-	if g_mgr and notify then
+	if g_mgr and params.notify then
 		g_mgr:gesture{
 			target=self,
 			id=self._id,
 			type=Gesture.STATE,
-			state=self:getState()
+			state=state
 		}
 	end
 end
@@ -536,9 +539,10 @@ function Gesture:do_state_recognized( params )
 	params = params or {}
 	if params.notify==nil then params.notify=true end
 	--==--
+
 	self:setState( Gesture.STATE_RECOGNIZED )
-	self:_dispatchGestureNotification( params.notify )
-	self:_dispatchStateNotification( params.notify )
+	self:_dispatchGestureNotification( params )
+	self:_dispatchStateNotification( params )
 	self:_dispatchRecognizedEvent()
 end
 
@@ -563,7 +567,7 @@ function Gesture:do_state_failed( params )
 	--==--
 	self:_stopAllTimers()
 	self:setState( Gesture.STATE_FAILED )
-	self:_dispatchStateNotification( params.notify )
+	self:_dispatchStateNotification( params )
 end
 
 function Gesture:state_failed( next_state, params )
