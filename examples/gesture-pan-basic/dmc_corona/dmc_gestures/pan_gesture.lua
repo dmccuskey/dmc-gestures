@@ -391,11 +391,16 @@ function PanGesture:touch( event )
 		self:gotoState( Continuous.STATE_CANCELLED )
 
 	else -- phase='ended'
+		local _mabs = mabs
+		local threshold = self._threshold
+
 		if state==Continuous.STATE_POSSIBLE then
 			if touch_count==0 then
 				self:gotoState( Continuous.STATE_FAILED )
 			elseif is_touch_ok then
-				self:gotoState( Continuous.STATE_BEGAN, event )
+				if (_mabs(event.xStart-event.x)>threshold or _mabs(event.yStart-event.y)>threshold) then
+					self:gotoState( Continuous.STATE_BEGAN, event )
+				end
 			else
 				self:gotoState( Continuous.STATE_SOFT_RESET, event )
 			end

@@ -503,7 +503,7 @@ function Gesture:do_state_possible( params )
 end
 
 function Gesture:state_possible( next_state, params )
-	-- print( "Gesture:state_possible: >> ", next_state )
+	-- print( "Gesture:state_possible: >> ", next_state, self.id )
 
 	--== Check Delegate to see if this transition is OK
 
@@ -545,7 +545,7 @@ function Gesture:do_state_recognized( params )
 end
 
 function Gesture:state_recognized( next_state, params )
-	-- print( "Gesture:state_recognized: >> ", next_state )
+	-- print( "Gesture:state_recognized: >> ", next_state, self.id )
 
 	if next_state == Gesture.STATE_POSSIBLE then
 		self:do_state_possible( params )
@@ -569,7 +569,7 @@ function Gesture:do_state_failed( params )
 end
 
 function Gesture:state_failed( next_state, params )
-	-- print( "Gesture:state_failed: >> ", next_state )
+	-- print( "Gesture:state_failed: >> ", next_state, self.id )
 
 	if next_state == Gesture.STATE_POSSIBLE then
 		self:do_state_possible( params )

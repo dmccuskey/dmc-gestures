@@ -277,7 +277,7 @@ Continuous.touch = Gesture.touch
 
 
 function Continuous:state_possible( next_state, params )
-	-- print( "Continuous:state_possible: >> ", next_state )
+	-- print( "Continuous:state_possible: >> ", next_state, self.id )
 
 	--== Check Delegate to see if this transition is OK
 
@@ -311,7 +311,6 @@ function Continuous:do_state_began( params )
 	params = params or {}
 	if params.notify==nil then params.notify=true end
 	--==--
-
 	self:_stopAllTimers()
 	self:setState( Continuous.STATE_BEGAN )
 	self:_dispatchGestureNotification( params )
