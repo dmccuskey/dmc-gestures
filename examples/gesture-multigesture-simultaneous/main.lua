@@ -89,21 +89,26 @@ end
 --====================================================================--
 
 
-local function main()
+--======================================================--
+--== join Pan and Pinch
+
+local function example_1()
 
 	local view, pan, pinch
 	local delegate
+
+	setupUI()
 
 	local function gestureEvent_handler( event )
 		-- print( "gestureEvent_handler", event.type, event.phase )
 		if event.type == event.target.GESTURE then
 
 			if event.phase=='began' then
-
+				-- do stuff here
 			elseif event.phase=='changed' then
-
+				-- do stuff here
 			else
-
+				-- do stuff here
 			end
 			displayFeedback( "Gesture: "..tostring(event.id) )
 		end
@@ -140,8 +145,64 @@ local function main()
 end
 
 
--- start the action !
+-- example_1()
 
-setupUI()
-main()
 
+--======================================================--
+--== join Pan, Pinch, Double Tap, the new blend
+
+local function example_2()
+
+	local view, pan, pinch
+	local delegate
+
+	setupUI()
+
+	local function gestureEvent_handler( event )
+		-- print( "gestureEvent_handler", event.target.id, event.type, event.phase )
+		if event.type == event.target.GESTURE then
+
+			if event.phase=='began' then
+				-- do stuff here
+			elseif event.phase=='changed' then
+				-- do stuff here
+			else
+				-- do stuff here
+			end
+
+			displayFeedback( "Gesture: "..tostring(event.id) )
+		end
+	end
+
+	delegate = {
+		shouldRecognizeWith=shouldRecognizeSimultaneously
+	}
+
+	-- create touch area for gestures
+
+	view = display.newRect( H_CENTER, V_CENTER+40, V_CENTER, V_CENTER )
+	view:setFillColor( 0.3,0.3,0.3 )
+
+	-- create some gestures, link to touch area
+
+	-- pan gesture, 1 touch
+
+	pan = Gesture.newPanGesture( view, { touches=1, id='1 pan' } )
+	pan.delegate=delegate
+	pan:addEventListener( pan.EVENT, gestureEvent_handler )
+
+	-- pan gesture, 2 touch
+
+	pan = Gesture.newPanGesture( view, { touches=2, id='2 pan' } )
+	pan.delegate=delegate
+	pan:addEventListener( pan.EVENT, gestureEvent_handler )
+
+	-- pinch gesture, 2 touch
+
+	pinch = Gesture.newPinchGesture( view, { id='pinch', delegate=delegate } )
+	pinch:addEventListener( pinch.EVENT, gestureEvent_handler )
+
+end
+
+
+example_2()
