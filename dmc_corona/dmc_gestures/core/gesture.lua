@@ -415,7 +415,7 @@ end
 -- Touch Event
 
 function Gesture:_createTouchEvent( event )
-	-- print( "Gesture:_createTouchEvent", event, self )
+	-- print( "Gesture:_createTouchEvent", self.id )
 	self._total_touch_count = self._total_touch_count + 1
 	self._touch_count = self._touch_count + 1
 	self._touches[ tstr(event.id) ] = {
@@ -432,7 +432,7 @@ function Gesture:_createTouchEvent( event )
 end
 
 function Gesture:_updateTouchEvent( event )
-	-- print( "Gesture:_updateTouchEvent" )
+	-- print( "Gesture:_updateTouchEvent", self.id )
 	for id, evt in pairs( self._touches ) do
 		if id==tstr(event.id) then
 			evt.x, evt.y = event.x, event.y
@@ -444,7 +444,7 @@ function Gesture:_updateTouchEvent( event )
 end
 
 function Gesture:_endTouchEvent( event )
-	-- print( "Gesture:_endTouchEvent" )
+	-- print( "Gesture:_endTouchEvent", self.id )
 	self:_updateTouchEvent( event )
 	self._touch_count = self._touch_count - 1
 end
@@ -463,7 +463,7 @@ end
 
 
 function Gesture:touch( event )
-	-- print("Gesture:touch" )
+	-- print("Gesture:touch", event.phase, self.id )
 	local phase = event.phase
 	if phase=='began' then
 		self:_createTouchEvent( event )
@@ -505,7 +505,7 @@ function Gesture:do_state_possible( params )
 end
 
 function Gesture:state_possible( next_state, params )
-	-- print( "Gesture:state_possible: >> ", next_state )
+	print( "Gesture:state_possible: >> ", next_state )
 
 	--== Check Delegate to see if this transition is OK
 

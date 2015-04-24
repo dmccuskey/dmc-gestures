@@ -151,7 +151,7 @@ end
 
 
 function Continuous:_addMultitouchToQueue( phase )
-	-- print("Continuous:_addMultitouchToQueue", phase )
+	-- print("Continuous:_addMultitouchToQueue", phase, self.id )
 	local me = self:_createMultitouchEvent({phase=phase})
 	self._multitouch_evt = me
 	tinsert( self._multitouch_queue, me )
@@ -320,7 +320,7 @@ function Continuous:do_state_began( params )
 end
 
 function Continuous:state_began( next_state, params )
-	-- print( "Continuous:state_began: >> ", next_state, params )
+	-- print( "Continuous:state_began: >> ", next_state, self.id )
 
 	if next_state == Continuous.STATE_CHANGED then
 		self:do_state_changed( params )
@@ -358,7 +358,7 @@ function Continuous:do_state_changed( params )
 end
 
 function Continuous:state_changed( next_state, params )
-	-- print( "Continuous:state_changed: >> ", next_state )
+	-- print( "Continuous:state_changed: >> ", next_state, self.id )
 
 	if next_state == Continuous.STATE_CHANGED then
 		self:do_state_changed( params )
