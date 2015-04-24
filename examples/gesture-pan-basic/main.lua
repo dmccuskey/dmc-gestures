@@ -80,7 +80,7 @@ local function main()
 
 
 	local function gestureEvent_handler( event )
-		-- print( "gestureEvent_handler", event.phase )
+		-- print( "gestureEvent_handler", event.target.id, event.phase )
 		if event.type == event.target.GESTURE then
 			if event.phase=='began' then
 				circle = display.newCircle( event.x, event.y, 10 )
