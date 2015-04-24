@@ -82,7 +82,7 @@ local function main()
 	local view, tap
 
 	local function gestureEvent_handler( event )
-		-- print( "gestureEvent_handler", event.phase )
+		-- print( "gestureEvent_handler", event.target.id, event.phase )
 		if event.type == event.target.GESTURE then
 			if event.phase=='began' then
 				circle = display.newCircle( event.x, event.y, 10 )
@@ -103,6 +103,15 @@ local function main()
 	-- create a gesture, link to touch area
 
 	tap = Gesture.newLongPressGesture( view, { id="1 tch 0 tap", taps=0 }  )
+	tap:addEventListener( tap.EVENT, gestureEvent_handler )
+
+	tap = Gesture.newLongPressGesture( view, { id="1 tch 1 tap", taps=1 }  )
+	tap:addEventListener( tap.EVENT, gestureEvent_handler )
+
+	tap = Gesture.newLongPressGesture( view, { id="1 tch 2 tap", taps=2 }  )
+	tap:addEventListener( tap.EVENT, gestureEvent_handler )
+
+	tap = Gesture.newLongPressGesture( view, { touches=2, taps=0, id="2 tch 0 tap" } )
 	tap:addEventListener( tap.EVENT, gestureEvent_handler )
 
 	tap = Gesture.newLongPressGesture( view, { touches=2, taps=1, id="2 tch 1 tap" } )
