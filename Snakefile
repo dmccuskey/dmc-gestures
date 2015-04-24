@@ -28,6 +28,7 @@ module_config = {
 			"dmc-corona-boot",
 			"DMC-Lua-Library",
 			"dmc-objects",
+			"dmc-patch",
 			"dmc-utils",
 			"dmc-touchmanager"
 		]
