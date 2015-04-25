@@ -320,6 +320,9 @@ function Continuous:state_possible( next_state, params )
 	elseif next_state == Continuous.STATE_POSSIBLE then
 		self:do_state_possible( params )
 
+	elseif next_state == Continuous.STATE_SOFT_RESET then
+		self:do_state_soft_reset( params )
+
 	else
 		pwarn( sfmt( "Continuous:state_possible unknown transition '%s'", tstr( next_state )))
 	end
