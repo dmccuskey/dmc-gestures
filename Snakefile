@@ -41,6 +41,12 @@ module_config = {
 				"requires": []
 			},
 			{
+				"exp_dir": "gesture-memtest",
+				"requires": [
+					"dmc-performance"
+				]
+			},
+			{
 				"exp_dir": "gesture-multigesture-basic",
 				"requires": []
 			},
