@@ -1,7 +1,7 @@
 --====================================================================--
 -- dmc_corona/dmc_gesture/core/gesture.lua
 --
--- Documentation:
+-- Documentation: https://github.com/dmccuskey/dmc-gestures
 --====================================================================--
 
 --[[

@@ -1,7 +1,7 @@
 --===================================================================--
 -- dmc_corona/dmc_touchmanager.lua
 --
--- Documentation: http://docs.davidmccuskey.com/dmc-touchmanager
+-- Documentation: https://github.com/dmccuskey/dmc-touchmanager
 --===================================================================--
 
 --[[
@@ -134,10 +134,8 @@ An object which coordinates one or many Gesture Receivers
 
 dmc_lib_data.dmc_touchmanager = dmc_lib_data.dmc_touchmanager or {}
 
-local DMC_TOUCHMANAGER_DEFAULTS = {
-	default_color_format='dRGBA',
-	-- named_color_file, no default,
-}
+-- dmc-touchmanager has no settings
+local DMC_TOUCHMANAGER_DEFAULTS = {}
 
 local dmc_touchmanager_data = Utils.extend( dmc_lib_data.dmc_touchmanager, DMC_TOUCHMANAGER_DEFAULTS )
 

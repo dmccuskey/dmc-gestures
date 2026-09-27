@@ -84,6 +84,9 @@ local function main()
 		if event.type == event.target.GESTURE then
 			local eS = event.scale
 
+			-- a two-finger tap can send 'ended' without 'began' (see Known Issues)
+			if event.phase~='began' and not xScale then return end
+
 			if event.phase=='began' then
 				-- store current scale for this gesture event
 				xScale, yScale = view.xScale, view.yScale
@@ -102,13 +105,14 @@ local function main()
 
 			else
 				view.xScale, view.yScale = xScale*eS, yScale*eS
+				xScale, yScale = nil, nil
 
 				if showCircle then
 					if circle then circle:removeSelf() ; circle=nil end
 				end
 
 			end
-			displayFeedback( "Gesture: "..tostring(event.id)..tostring(event.scale) )
+			displayFeedback( string.format( "Gesture: %s %.2f", tostring(event.id), eS ) )
 		end
 	end
 

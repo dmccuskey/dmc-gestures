@@ -1,7 +1,7 @@
 --===================================================================--
 -- dmc_corona/dmc_gestures.lua
 --
--- Documentation: http://docs.davidmccuskey.com/dmc-gestures
+-- Documentation: https://github.com/dmccuskey/dmc-gestures
 --===================================================================--
 
 --[[
@@ -184,11 +184,12 @@ end
 --
 -- @object view Corona Display object
 -- @tparam[opt] table params
+-- @int[opt=10] params.accuracy the maximum movement allowed before the press is recognized.
 -- @object[opt] params.delegate a delegate object to control this gesture
+-- @int[opt=500] params.duration how long the press must be held, in milliseconds.
 -- @string[opt=nil] params.id an id for this gesture, used to differentiate gestures. value is available in an `Event`.
--- @int[opt=1] params.max_touches maximum number of touches required for gesture. This defaults to `params.touches`.
--- @int[opt=10] params.threshold movement required to recognize the tap.
--- @int[opt=1] params.touches minimum number of touches required for gesture.
+-- @int[opt=0] params.taps number of taps required before the press.
+-- @int[opt=1] params.touches number of touches required for gesture.
 --
 -- @return @{Gesture.LongPress} a Long-Press Gesture Recognizer
 --
@@ -302,14 +303,13 @@ end
 -- @int[opt=10] params.accuracy the maximum movement allowed between taps.
 -- @object[opt] params.delegate a delegate object to control this gesture
 -- @string[opt=nil] params.id an id for this gesture, used to differentiate gestures. value is available in an `Event`.
--- @int[opt=1] params.taps minimum number of taps required for gesture.
--- @int[opt=300] params.time maximum time between taps.
--- @int[opt=1] params.touches minimum number of touches required for gesture.
+-- @int[opt=1] params.taps number of taps required for gesture.
+-- @int[opt=1] params.touches number of touches required for gesture.
 --
 -- @return @{Gesture.Tap} a Tap Gesture Recognizer
 --
 -- @usage local g = Gesture.newTapGesture( view )
--- @usage local g = Gesture.newTapGesture( view, { id="my-tap", threshold=10 } )
+-- @usage local g = Gesture.newTapGesture( view, { id="my-tap", taps=2 } )
 
 function Gesture.newTapGesture( view, params )
 	-- print( "Gesture.newTapGesture", view )
