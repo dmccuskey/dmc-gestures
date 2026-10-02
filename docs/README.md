@@ -14,12 +14,14 @@ New here? The [Quick Start](../README.md#quick-start) makes a square you drag an
 ## Contribute
 
 - [Development](development.md): which files are generated, building, testing, possible future changes
+- [Changelog](../CHANGELOG.md)
 - [Issues](https://github.com/dmccuskey/dmc-gestures/issues)
 
 ## Project Structure
 
 ```text
 README.md                       landing page and Quick Start
+CHANGELOG.md
 LICENSE
 docs/                           this documentation
 └── images/                     screenshots for the README
@@ -32,5 +34,6 @@ dmc_corona_boot.lua             loader, from dmc-corona-boot (generated copy)
 dmc_corona.cfg                  library configuration
 examples/                       sample apps, each with its own generated dmc_corona/
 └── screenshots/                one per app, for examples/README.md
+tests/                          unit tests, run_unit.sh
 Snakefile                       build rules for the generated copies
 ```

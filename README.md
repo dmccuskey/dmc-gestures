@@ -18,7 +18,7 @@ end )
 - Four gestures: tap, long press, pan (drag) and pinch (zoom), each with its number of touches, taps and tolerances
 - Multi-touch: two-finger taps, three-finger pans, pinches
 - Several gestures on one object: when one is recognized, the others give up, unless a delegate lets them run together (pan and pinch at the same time, for example)
-- Pan, pinch and long press report `began`, `changed` and `ended`, with the center of the touches and, for pinch, the scale
+- Pan, pinch and long press report `began`, `changed` and `ended`, with the center of the touches, the velocity of a pan or pinch and, for pinch, the scale
 - Touches that begin on the object stay with it when they move off it, through [dmc-touchmanager](https://github.com/dmccuskey/dmc-touchmanager)
 - Pure Lua, no plugins needed; MIT licensed
 
@@ -102,6 +102,7 @@ To update, copy `dmc_corona_boot.lua` and `dmc_corona/` again from the newer ver
 
 - [API reference](docs/api.md): the four gestures and their settings, the gesture event, several gestures on one object, delegates, known issues
 - [Examples](examples/): each gesture on its own, several gestures on one object, a memory test
+- [Changelog](CHANGELOG.md)
 
 Everything else is listed on the [documentation home](docs/README.md).
 

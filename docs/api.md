@@ -1,6 +1,6 @@
 # API Reference
 
-Everything dmc-gestures provides, for version 2.0.0. The [Quick Start](../README.md#quick-start) shows it in use.
+Everything dmc-gestures provides, for version 2.1.0. The [Quick Start](../README.md#quick-start) shows it in use.
 
 ## Quick Reference
 
@@ -30,7 +30,7 @@ The constructors use a dot (`.`); the methods use a colon (`:`).
 local Gesture = require 'dmc_corona.dmc_gestures'
 ```
 
-It loads [dmc-touchmanager](https://github.com/dmccuskey/dmc-touchmanager), which calls `system.activate( 'multitouch' )`, so the app doesn't need to. The gesture classes load when first used.
+It loads [dmc-touchmanager](https://github.com/dmccuskey/dmc-touchmanager), which calls `system.activate( 'multitouch' )`, so the app doesn't need to. The gesture classes load when first used. `Gesture.VERSION` is the version, a string.
 
 ## How Gestures Work
 
@@ -45,7 +45,7 @@ Touches reach the gestures once per frame, one frame late: the manager collects 
 
 ## The Gestures
 
-The parameters are the fields of the optional `params` table. Each (except `id` and `delegate`) is also a property of the gesture, which can be changed later: `tap.taps = 3`. Distances are in content units (points); a value outside the allowed range fails an assertion.
+The parameters are the fields of the optional `params` table. Each (except `id`, `delegate` and `debug_on`) is also a property of the gesture, which can be changed later: `tap.taps = 3`. Distances are in content units (points); a value outside the allowed range fails an assertion.
 
 Every constructor also takes:
 
@@ -53,6 +53,7 @@ Every constructor also takes:
 |---|---|---|---|
 | `id` | string | `nil` | copied into each event, to tell gestures apart in a shared listener |
 | `delegate` | table | `nil` | see [Delegates](#delegates) |
+| `debug_on` | boolean | the `debug_active` [setting](#configuration) | print the gesture's state changes and events |
 
 ### Tap
 
@@ -65,10 +66,11 @@ local tap = Gesture.newTapGesture( obj, { touches=2, taps=2 } )  -- two-finger d
 | `taps` | number | `1` | 1 to 5 | how many taps |
 | `touches` | number | `1` | 1 to 4 | how many fingers in each tap |
 | `accuracy` | number | `10` | above 0 | how far a finger can move from where it went down, across or up and down, before the tap fails |
+| `timeout` | number | `300` | above 0 | the time allowed for each step, in milliseconds: once all the fingers are down they must all lift within it, and the next tap must start within it of the last one |
 
-The timing is fixed at 300 ms: once all the fingers are down, they must all lift within 300 ms, and the next tap must start within 300 ms of the last one. More fingers than `touches`, or more taps than `taps`, fail the gesture.
+More fingers than `touches`, or more taps than `taps`, fail the gesture.
 
-The event has no position: it has only `id` and `gesture` (`'tap'`) besides the usual fields.
+The event has `x` and `y`, the center of the fingers as they lifted on the last tap, and `time`, `system.getTimer()` when the tap was recognized.
 
 ### Long Press
 
@@ -83,7 +85,7 @@ local press = Gesture.newLongPressGesture( obj, { duration=800 } )
 | `touches` | number | `1` | 1 to 5 | how many fingers |
 | `accuracy` | number | `10` | above 0 | how far a finger can move before `duration` is up |
 
-`began` comes when the press has been held for `duration`; the fingers can then move freely, sending `changed`, and `ended` comes when they lift. Lifting early, moving too far, or a finger too many fails it. The taps before the press follow the tap timing (300 ms).
+`began` comes when the press has been held for `duration`; the fingers can then move freely, sending `changed`, and `ended` comes when they lift. Lifting early, moving too far, or a finger too many fails it. The taps before the press follow the default tap timing (300 ms).
 
 ### Pan
 
@@ -97,9 +99,9 @@ local pan = Gesture.newPanGesture( obj, { touches=2 } )  -- two-finger drag
 | `max_touches` | number | `touches` | 1 to 255 | the most fingers |
 | `threshold` | number | `10` | 0 to 255 | how far a finger must move, across or up and down, before the pan begins; `0` begins it as soon as the fingers are down |
 
-`x` and `y` in the event are the center of the fingers. The pan ends when the fingers lift. If the number of fingers leaves the `touches` to `max_touches` range, the pan sends `ended`, and it sends `began` again if the count comes back into range and the fingers move.
+`x` and `y` in the event are the center of the fingers. The pan ends when the fingers lift. More fingers than `max_touches` before the pan begins fail it, until they all lift. Once it has begun, if the number of fingers leaves the `touches` to `max_touches` range, the pan sends `ended`, and it sends `began` again if the count comes back into range and the fingers move.
 
-`pan.velocity` is always `0` (not written).
+The events have `velocity`, the speed of the center of the fingers in points per second, and its parts across and down, `xVelocity` and `yVelocity` (negative to the left and up). It's measured over the last 100 ms of movement, so it's `0` when the fingers were held still that long before they lifted. `pan.velocity` is the same, while the pan runs; it goes back to `0` once the fingers have lifted.
 
 ### Pinch
 
@@ -112,7 +114,7 @@ local pinch = Gesture.newPinchGesture( obj )
 | `threshold` | number | `5` | above 0, below 256 | how much the distance between the fingers must change before the pinch begins |
 | `reset_scale` | boolean | `true` | | `true`: each pinch's `scale` starts from 1. `false`: it carries on from where the last pinch ended, so `scale` is the total since the gesture was made |
 
-A pinch takes exactly two fingers. The event's `scale` is the distance between them now divided by the distance when the pinch began: above 1 when they move apart, below 1 when they move together. To zoom an object, save its scale at `began` and multiply:
+A pinch takes exactly two fingers: a third before the pinch begins fails it, until they all lift, and lifting one before it begins waits for a second finger again. The event's `scale` is the distance between them now divided by the distance when the pinch began: above 1 when they move apart, below 1 when they move together. To zoom an object, save its scale at `began` and multiply:
 
 ```lua
 local xScale, yScale
@@ -122,14 +124,11 @@ pinch:addEventListener( pinch.EVENT, function( event )
 	if event.phase == 'began' then
 		xScale, yScale = obj.xScale, obj.yScale
 	end
-	if xScale then  -- see Known Issues: 'ended' can come without 'began'
-		obj.xScale, obj.yScale = xScale*event.scale, yScale*event.scale
-	end
-	if event.phase == 'ended' then xScale, yScale = nil, nil end
+	obj.xScale, obj.yScale = xScale*event.scale, yScale*event.scale
 end )
 ```
 
-`pinch.velocity` is always `0`, and `pinch.test_mode` does nothing (not written).
+The events have `velocity`, how fast `scale` changes, per second (negative when the fingers move together), measured like the pan's. `pinch.velocity` is the same, while the pinch runs.
 
 ## The Gesture Event
 
@@ -149,13 +148,15 @@ Continuous gestures (long press, pan, pinch) add:
 |---|---|
 | `phase` | `'began'`, `'changed'` or `'ended'` |
 | `x`, `y` | the center of the fingers, in content coordinates |
-| `xStart`, `yStart` | where `x`, `y` were at the start (but see [Known Issues](#known-issues)) |
+| `xStart`, `yStart` | where `x`, `y` were when the gesture's touches began |
 | `count` | how many fingers are down; at `ended`, after the lift |
-| `time` | `system.getTimer()` when the event was made |
+| `time` | when the touch behind the event happened (its `time`), or `system.getTimer()` |
 | `touches` | the touches themselves, keyed on `tostring( touch id )`: each a table with `id`, `x`, `y`, `xStart`, `yStart`, `phase` |
 | `scale` | pinch only: see [Pinch](#pinch) |
+| `velocity` | pan and pinch: see [Pan](#pan) and [Pinch](#pinch) |
+| `xVelocity`, `yVelocity` | pan only |
 
-A continuous gesture reuses one table for its `changed` and `ended` events, and `touches` is the gesture's own table: copy what you need to keep rather than keeping the event.
+A continuous gesture sends `ended` only after `began`. It reuses one table for its `changed` and `ended` events, and `touches` is the gesture's own table: copy what you need to keep rather than keeping the event.
 
 To move an object with a pan, save its offset from the fingers at `began`, as the [Quick Start](../README.md#quick-start) does. Setting the object's position to `x`, `y` directly makes it jump so that its center is under the fingers (the `gesture-pan-move` example does this).
 
@@ -171,7 +172,7 @@ local tap2 = Gesture.newTapGesture( obj, { taps=2, id='zoom' } )
 
 When one is recognized (a tap) or begins (a continuous gesture), the others fail and stop getting touches until every touch has ended, unless a delegate keeps them ([Delegates](#delegates)). So of the gestures above, whichever matches the touches first wins.
 
-There is no way to make one gesture wait for another to fail (iOS's `requiresGestureRecognizerToFail`): a single tap and a double tap on the same object don't work together, because the single tap is recognized at the first tap and fails the double tap.
+There is no way to make one gesture wait for another to fail (iOS's `requiresGestureRecognizerToFail`, [#2](https://github.com/dmccuskey/dmc-gestures/issues/2)): a single tap and a double tap on the same object don't work together, because the single tap is recognized at the first tap and fails the double tap.
 
 ## Delegates
 
@@ -183,7 +184,7 @@ A delegate is a table with any of these functions; set it with the `delegate` pa
 | `delegate.gestureShouldBegin( gesture )` | when `gesture` is about to leave the possible state | `false` to fail it instead |
 | `delegate.shouldReceiveTouch( gesture )` | when a new touch begins on the view | `false` to leave `gesture` out until the touches end; must be a boolean |
 
-Note the colon and the dots: `shouldRecognizeWith` gets the delegate as its first argument, the other two get only the gesture.
+Note the colon and the dots: `shouldRecognizeWith` gets the delegate as its first argument, the other two get only the gesture ([#3](https://github.com/dmccuskey/dmc-gestures/issues/3)).
 
 To let a pan and a pinch run at the same time (as a photo viewer does), give both a delegate that says yes:
 
@@ -199,28 +200,31 @@ The `gesture-multigesture-simultaneous` example does this with a pan, a pinch an
 
 ## Removing Gestures
 
-`gesture:removeSelf()` removes a gesture from its view. When the last gesture on a view is removed, the view's gesture manager goes too, and the view is unregistered from dmc-touchmanager. Remove a view's gestures before removing the view (see [Known Issues](#known-issues)). The `gesture-memtest` example makes and removes gestures in a loop to check for leaks.
+`gesture:removeSelf()` removes a gesture from its view. When the last gesture on a view is removed, the view's gesture manager goes too, and the view is unregistered from dmc-touchmanager.
+
+Removing the view (`view:removeSelf()`) removes its gestures too, so don't call `removeSelf()` on them afterwards. The `gesture-memtest` example makes and removes gestures in a loop to check for leaks.
 
 ## Configuration
 
-dmc-gestures has no settings in effect. It reads a `[DMC_GESTURE]` section of `dmc_corona.cfg` with one key, `debug_active` (boolean, default `false`), but nothing uses it. The file needs only the `[DMC_CORONA]` section, which tells the loader where the libraries are ([dmc-corona-boot Configuration](https://github.com/dmccuskey/dmc-corona-boot/blob/master/docs/configuration.md)).
+dmc-gestures reads a `[DMC_GESTURE]` section of `dmc_corona.cfg`, with one setting:
+
+| Key | Type | Default | |
+|---|---|---|---|
+| `DEBUG_ACTIVE` | boolean | `false` | the default for each gesture's `debug_on`: print its state changes and the events it sends |
+
+```text
+[DMC_GESTURE]
+DEBUG_ACTIVE:BOOL = true
+```
+
+The file needs only the `[DMC_CORONA]` section, which tells the loader where the libraries are ([dmc-corona-boot Configuration](https://github.com/dmccuskey/dmc-corona-boot/blob/master/docs/configuration.md)).
 
 ## Background
 
-dmc-gestures follows the design of UIKit's [UIGestureRecognizer](https://developer.apple.com/documentation/uikit/uigesturerecognizer): the states, the discrete and continuous kinds, and the delegate's `shouldRecognizeWith` (iOS's `gestureRecognizer(_:shouldRecognizeSimultaneouslyWith:)`), `gestureShouldBegin` and `shouldReceiveTouch`. Swipe and rotation gestures, iOS's `cancelsTouchesInView`, `delaysTouchesBegan`, `delaysTouchesEnded` and `requiresGestureRecognizerToFail` aren't written: the methods of those names on a gesture do nothing.
+dmc-gestures follows the design of UIKit's [UIGestureRecognizer](https://developer.apple.com/documentation/uikit/uigesturerecognizer): the states, the discrete and continuous kinds, and the delegate's `shouldRecognizeWith` (iOS's `gestureRecognizer(_:shouldRecognizeSimultaneouslyWith:)`), `gestureShouldBegin` and `shouldReceiveTouch`. Swipe and rotation gestures, iOS's `cancelsTouchesInView`, `delaysTouchesBegan`, `delaysTouchesEnded` and `requiresGestureRecognizerToFail` ([#2](https://github.com/dmccuskey/dmc-gestures/issues/2)) aren't written: the methods of those names on a gesture do nothing.
 
 ## Known Issues
 
-- **A continuous gesture can send `ended` without `began`.** A two-finger tap on a pinch, or two fingers down and one lifted before the pinch begins, sends the pinch listener an `ended` (with `scale` 1). A listener that sets things up in `began` and uses them in `ended` fails; the `gesture-pinch-basic` example crashed this way until it was guarded. Check that `began` came first.
-- **`xStart`, `yStart` aren't where the touches began** in pan and pinch events: in `changed` and `ended` they are where the first move was seen (for a pan, past the `threshold`). The `began` event is a different table, with the right values. Keep the position from `began` instead.
-- **Lifting one finger of a pinch can start a one-finger pan** on the same view, when a delegate keeps both running: the pan sends `began` and `ended` with no `changed` between.
-- **A single tap wins over a double tap** on the same view ([Several Gestures](#several-gestures-on-one-object)); there's no `requiresGestureRecognizerToFail`.
-- **A removed view stays registered.** A view removed with `removeSelf()` while it has gestures is never freed: its gesture manager and dmc-touchmanager keep it. Remove the gestures first.
-- **The delegate functions are called in two ways**: `shouldRecognizeWith` with the delegate first, `gestureShouldBegin` and `shouldReceiveTouch` without it ([Delegates](#delegates)).
-- Tap events have no position or time.
-- The tap timing (300 ms) can't be changed.
-- `velocity` is always `0` for pan and pinch; pinch's `test_mode` does nothing.
-- The `[DMC_GESTURE]` `debug_active` setting isn't used.
-- The version isn't exported: `Gesture.VERSION` is `nil`.
-- It leaks the global `_extend`.
-- There are no tests.
+- **A single tap wins over a double tap** on the same view ([Several Gestures](#several-gestures-on-one-object)); there's no `requiresGestureRecognizerToFail` ([#2](https://github.com/dmccuskey/dmc-gestures/issues/2)).
+- **The delegate functions are called in two ways**: `shouldRecognizeWith` with the delegate first, `gestureShouldBegin` and `shouldReceiveTouch` without it ([Delegates](#delegates), [#3](https://github.com/dmccuskey/dmc-gestures/issues/3)).
+- The long press's tap timing (300 ms) can't be changed.
