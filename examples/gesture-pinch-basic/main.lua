@@ -84,9 +84,6 @@ local function main()
 		if event.type == event.target.GESTURE then
 			local eS = event.scale
 
-			-- a two-finger tap can send 'ended' without 'began' (see Known Issues)
-			if event.phase~='began' and not xScale then return end
-
 			if event.phase=='began' then
 				-- store current scale for this gesture event
 				xScale, yScale = view.xScale, view.yScale
