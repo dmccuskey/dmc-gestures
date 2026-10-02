@@ -12,10 +12,10 @@ The `dmc_corona.cfg` files, at the root and in the examples, aren't generated: e
 |---|---|
 | `dmc_gestures.lua` | the module: `new*Gesture()`, one gesture manager per view |
 | `dmc_gestures/core/gesture.lua` | base class: state machine (possible, recognized, failed), timers, delegate calls |
-| `dmc_gestures/core/continuous_gesture.lua` | base for long press, pan, pinch: began, changed, ended; the event table |
+| `dmc_gestures/core/continuous_gesture.lua` | base for long press, pan, pinch: began, changed, ended; the event table; velocity |
 | `dmc_gestures/gesture_manager.lua` | per view: gets touches from dmc-touchmanager, hands them to the gestures each frame, fails the others when one is recognized |
 | `dmc_gestures/*_gesture.lua` | the four gestures |
-| `dmc_gestures/gesture_constants.lua` | defaults and timings |
+| `dmc_gestures/gesture_constants.lua` | defaults, timings, the velocity window |
 | `dmc_gestures/delegate_gesture.lua` | LDoc for the delegate interface only; not loaded |
 
 It uses [dmc-objects](https://github.com/dmccuskey/dmc-objects) (classes, events), dmc-states-mixin (the state machine), dmc-patch, dmc-utils and [dmc-touchmanager](https://github.com/dmccuskey/dmc-touchmanager). [DMC-Corona-Library](https://github.com/dmccuskey/DMC-Corona-Library) bundles it: after a change here, rebuild it.
@@ -33,9 +33,16 @@ The build copies the sibling checkouts as they are on disk, on whatever branch e
 
 ## Testing
 
-There are no automated tests. Run the examples in the Solar2D Simulator.
+The tests are in `tests/dmc_gestures_spec.lua` ([lunatest](https://github.com/silentbicycle/lunatest)). Run them with plain Lua 5.1, with stand-ins for the Solar2D globals they touch (display objects, `Runtime`, `timer`, `system.getTimer()`). It needs the `dkjson` rock:
 
-The Simulator has one touch, the mouse, which is enough for one-finger taps, long presses and pans. For the rest, send made-up touches from the end of an example's `main.lua`: a `began` to the view, `view:dispatchEvent{ name='touch', phase='began', id=A, target=view, x=..., y=... }`, then `moved` and `ended` for the same id to `Runtime:dispatchEvent{ ... }` with `xStart` and `yStart` set to where it began. Any table works as a touch id. Space the steps a frame or more apart (with `timer.performWithDelay()`), since the gestures see touches once per frame. The Quick Start, the examples and their screenshots were checked this way, including two- and three-finger taps, pans and pinches.
+```sh
+tests/run_unit.sh                  # uses ../tools/lua51/bin/lua
+LUA=lua5.1 tests/run_unit.sh       # or another Lua 5.1
+```
+
+The touches go through dmc-touchmanager and the gesture manager as in Solar2D, and the tests move the clock a frame (16 ms) at a time, running the timers and `enterFrame`.
+
+Then run the examples in the Solar2D Simulator. The Simulator has one touch, the mouse, which is enough for one-finger taps, long presses and pans. For the rest, send made-up touches from the end of an example's `main.lua`: a `began` to the view, `view:dispatchEvent{ name='touch', phase='began', id=A, target=view, x=..., y=... }`, then `moved` and `ended` for the same id to `Runtime:dispatchEvent{ ... }` with `xStart` and `yStart` set to where it began. Any table works as a touch id. Space the steps a frame or more apart (with `timer.performWithDelay()`), since the gestures see touches once per frame. The Quick Start, the examples and their screenshots were checked this way, including two- and three-finger taps, pans and pinches.
 
 `gesture-memtest` checks for leaks: it makes and removes a view with a random gesture every 100 ms and prints the memory in use (`M:`, in KB), which should stay level.
 
@@ -43,8 +50,6 @@ The Simulator has one touch, the mouse, which is enough for one-finger taps, lon
 
 Each needs discussion and a concrete use case before it is worked on. The bugs are listed in the API reference's [Known Issues](api.md#known-issues).
 
-- Unit tests under plain Lua, with stand-ins for `Runtime`, `timer`, `system` and display objects, feeding scripted touches.
-- `requiresGestureRecognizerToFail`, so a single tap can wait for a double tap to fail.
-- Configurable tap timing.
-- Swipe and rotation gestures, and pan and pinch velocity.
-- Remove the gestures of a view when it is removed (`finalize` event).
+- `requiresGestureRecognizerToFail`, so a single tap can wait for a double tap to fail ([#2](https://github.com/dmccuskey/dmc-gestures/issues/2)).
+- One calling convention for the delegate functions ([#3](https://github.com/dmccuskey/dmc-gestures/issues/3)).
+- Swipe and rotation gestures.
